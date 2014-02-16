@@ -1,0 +1,12 @@
+{application, erlangeos,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { erlangeos_app, []}},
+  {env, []}
+ ]}.

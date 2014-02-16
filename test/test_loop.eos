@@ -1,0 +1,17 @@
+test()->
+    A = eos_loop.times(5) do
+        eosstd.puts("*")
+
+    B = eos_loop.times(5) do |N|
+        eosstd.puts( @"* #{N}")
+        if N == 3 then break(uho)
+
+    eosstd.puts( @"B = #{B}" )
+
+    $cnt := 0
+    C = while true do
+        eosstd.puts( @"count = #{$cnt}" )
+        $cnt := $cnt + 1
+        if $cnt > 5 then break(iiotoko)
+
+    eosstd.puts( @"C = #{C}" )

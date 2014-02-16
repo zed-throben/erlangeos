@@ -1,0 +1,54 @@
+-include_lib("kernel/include/file.hrl")
+
+compile_dir(Dir)->
+    compile_dir(Dir,Dir)
+
+compile_dir(Dir,DstDir)->
+    {ok,Files} = file.list_dir(Dir)
+    Targets = lists.foreach(
+        fun(File)->
+            if filename.extension(File) == ".eos" then procfile(Dir,DstDir,File)
+        ,Files)
+        where
+            Dir = erleos.trim_dir(Dir)
+            DstDir = erleos.trim_dir(DstDir)
+
+change_ext(Source,Ext)->
+    filename.rootname(Source) ++ Ext
+
+procfile(Dir,DstDir,File)->
+    Src = @"#{Dir}#{File}"
+    ErlFile = change_ext(File,".erl")
+    Dst = @"#{DstDir}#{ErlFile}"
+
+    //eosstd.puts( @"src = #{Src}")
+    //eosstd.puts( @"dst = #{Dst}")
+
+    case {file.read_file_info(Src),file.read_file_info(Dst)} of
+        { {ok,FIA},{ok,FIB} } ->
+            Diff = calendar.datetime_to_gregorian_seconds(FIA#file_info.ctime) - calendar.datetime_to_gregorian_seconds(FIB#file_info.ctime)
+            //eosstd.puts( @"file = #{File} diff = #{Diff}" )
+            if Diff > 0 then compile(Dir,DstDir,File)
+        _ ->
+            //eosstd.puts( @"file = #{File} is not a target" )
+            []
+
+compile(Dir,DstDir,File)->
+    Src = @"#{Dir}#{File}"
+    ErlFile = change_ext(File,".erl")
+    Dst = @"#{DstDir}#{ErlFile}"
+
+    eosstd.puts( @"compile #{Src} -> #{Dst}" )
+    erleos.compile_file(Src,Dst)
+
+loop(Dir,DstDir)->
+    compile_dir(Dir,DstDir)
+    timer.sleep(2500)
+    loop(Dir,DstDir)
+
+//
+start(Dir,DstDir)->
+    spawn( (\ ()->loop(Dir,DstDir)) )
+
+start(Dir)->
+    start(Dir,Dir)

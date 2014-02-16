@@ -1,0 +1,2 @@
+-define(VERSION,"0.01").
+-define(EOSRELEASE,false).

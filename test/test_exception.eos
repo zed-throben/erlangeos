@@ -1,0 +1,15 @@
+f(N)->
+    N*2
+
+test()->
+    aaa = try
+        AA = 10
+        BB = AA - f(5)
+        CC = AA / BB
+    catch
+        error.Reason ->
+            eosstd.puts( @"**error #{~p|Reason}" )
+            aaa
+        throw.Reason ->
+            eosstd.puts( @"**throw #{~p|Reason}" )
+            bbb

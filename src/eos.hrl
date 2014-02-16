@@ -1,0 +1,3 @@
+-record(eos,{type,param}).
+-define(eos(Type,Param),#eos{type=Type,param=Param}).
+-define(DICTIONARY,{dict,_,_,_,_,_,_,_,_}).

@@ -1,0 +1,3 @@
+-define(OBJTYPE,'eos_procobj').
+-define(invoke(Module,Method,Param),invoke_(Module,Method,Param) ).
+-include("eos_modobjbase.hrl").

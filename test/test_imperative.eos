@@ -1,0 +1,28 @@
+test()->
+    $a := 100
+    $b := 200
+    100 = $a
+    200 = $b
+    300 = $a + $b
+    $a := $a * 2
+    $b := $b * 2
+    600 = $a + $b
+
+    $a := 0
+    while $a < 10 do
+        io.format( @"No.#{$a}\n" )
+        $a := $a + 1
+
+    $a := 0
+    $sum := 0
+    {ok,4} = while $a < 10 do
+                $a := $a + 1
+                io.format( @"No.#{$a}\n" )
+                if ($a rem 2) == 0 then
+                    io.format( @"No.#{$a} continue\n" )
+                    continue()
+                elif $a >= 5 then
+                    io.format( @"No.#{$a} break\n" )
+                    break({ok,$sum})
+
+                $sum := $sum + $a

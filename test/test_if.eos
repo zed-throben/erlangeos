@@ -1,0 +1,22 @@
+test()->
+    30  = test_if( (\()->0) )
+    b   = test_if( (\()->1) )
+    200 = test_if( (\()->2) )
+    d   = test_if( (\()->3) )
+
+test_if(F)->
+    if F()==0 then
+        io.format("case 1\n",[])
+        AA = 10
+        BB = 20
+        AA+BB
+    elif F()==1 then
+        io.format("case 2\n",[])
+        b
+    elif F()==2 then
+        io.format("case 3\n",[])
+        CC = 100
+        CC*2
+    else
+        io.format("case 4\n",[])
+        d

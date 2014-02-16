@@ -1,0 +1,15 @@
+test()->
+    A = #<eos_protobj>{
+        hello = method(X)->io.format("hello ~s\n",[X])
+        set = method(X)->
+                This.a := X
+                This.b := X*2
+        add = method()->
+                This.a + This.b
+    }
+    
+    io.format("~p\n",[A.hello])
+    A.hello("world")
+
+    A.set(10)
+    30 = A.add()

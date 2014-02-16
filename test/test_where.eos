@@ -1,0 +1,73 @@
+test()->
+    testN(0)
+
+testN(N)->
+    eosstd.puts( @"test ##{N}" )
+    if test(N)!=eof
+    then testN(N+1)
+
+//
+    
+test(0)->
+    30 = A+B
+         where A=10
+               B=20
+
+test(1)->
+    X = A+B
+    Y = 100
+    130 = X+Y
+        where
+            A=10
+            B=20
+
+test(2)->
+    A = 10
+    B = if false then
+            ng
+        else
+            X+Y
+                where
+                    X= 300
+                    Y= 400
+    eosstd.puts( @"B = #{B}" )
+    700 = B
+
+test(3)->
+    A = 10
+    B = if false then
+            ng
+        else
+            X+Y+Z
+                where
+                    X= 300
+                    Y= 400
+    1700 = B
+        where Z = 1000
+
+
+
+test(4)->
+    A = 10
+    B = if A < 10 then
+            X+Y+Z
+                where
+                X=100
+                Y=200
+        else
+            X+Y+Z
+                where
+                    X= 300
+                    Y= 400
+    1700 = B
+        where
+            Z=1000
+
+test(5)->eof
+
+/*
+ng(0)->
+    130 = X + Y where X = A+B where A=10
+                                    B=20
+                      Y=100
+*/

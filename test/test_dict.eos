@@ -1,0 +1,19 @@
+test()->
+    PropList = [
+        {a,alpha}
+        {b,beta}
+        {c,gamma}
+    ]
+
+    3 = PropList.length()
+    alpha = PropList.a
+    beta  = PropList.b
+    gamma = PropList.c
+
+    Dict = dict.from_list(PropList)
+    3 = Dict.length()
+    alpha = Dict.a
+    beta  = Dict.b
+    gamma = Dict.c
+    
+    

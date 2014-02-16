@@ -1,0 +1,41 @@
+bmiTell::Float->Float->Float
+bmiTell(Weight,Height)->
+    cond  
+            Bmi <= Skinny -> "You're underweight, you emo, you!"  
+            Bmi <= Normal -> "You're supposedly normal. Pffft, I bet you're ugly!"  
+            Bmi <= Fat    -> "You're fat! Lose some weight, fatty!"  
+            true          -> "You're a whale, congratulations!"  
+        where
+            Bmi = Weight / (Height * Height)  
+            Skinny = 18.5  
+            Normal = 25.0  
+            Fat = 30.0  
+
+bmiTell2(Weight,Height)->
+    cond  
+        Bmi <= Skinny -> "You're underweight, you emo, you!"  
+        Bmi <= Normal -> "You're supposedly normal. Pffft, I bet you're ugly!"  
+        Bmi <= Fat    -> "You're fat! Lose some weight, fatty!"  
+        true          -> "You're a whale, congratulations!"  
+    where
+        Bmi = Weight / (Height * Height)  
+        Skinny = 18.5  
+        Normal = 25.0  
+        Fat = 30.0  
+
+bmiTell3(Weight,Height)->
+    let  
+        Bmi = Weight / (Height * Height)  
+        Skinny = 18.5  
+        Normal = 25.0  
+        Fat = 30.0 in
+    cond  
+        Bmi <= Skinny -> "You're underweight, you emo, you!"  
+        Bmi <= Normal -> "You're supposedly normal. Pffft, I bet you're ugly!"  
+        Bmi <= Fat    -> "You're fat! Lose some weight, fatty!"  
+        true          -> "You're a whale, congratulations!"  
+
+
+test()->
+    bmiTell(60,170)
+    bmiTell2(70,180)

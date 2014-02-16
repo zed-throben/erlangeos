@@ -1,0 +1,111 @@
+test()->
+    straight = check_hands([
+        {5,spade}
+        {3,heart}
+        {6,club}
+        {2,dia}
+        {4,dia}
+    ])    
+
+    straight_flush = check_hands([
+        {5,dia}
+        {3,dia}
+        {6,dia}
+        {2,dia}
+        {4,dia}
+    ])    
+
+    flush = check_hands([
+        {5,spade}
+        {3,spade}
+        {10,spade}
+        {12,spade}
+        {4,spade}
+    ])    
+
+    four_cards = check_hands([
+        {1,spade}
+        {1,dia}
+        {2,spade}
+        {1,club}
+        {1,heart}
+    ])    
+
+    fullhouse = check_hands([
+        {1,spade}
+        {2,dia}
+        {2,spade}
+        {1,club}
+        {1,heart}
+    ])    
+
+    three_cards = check_hands([
+        {1,spade}
+        {4,dia}
+        {2,spade}
+        {1,club}
+        {1,heart}
+    ])    
+
+    two_pair = check_hands([
+        {1,spade}
+        {4,dia}
+        {2,spade}
+        {1,club}
+        {2,heart}
+    ])    
+
+    one_pair = check_hands([
+        {1,spade}
+        {4,dia}
+        {2,spade}
+        {5,club}
+        {1,heart}
+    ])    
+
+check_hands(X)->
+    hands( lists.sort(X) )
+
+//
+    
+hands([ {1,X},{10,X},{11,X},{12,X},{13,X}]) ->
+    royal_flush
+
+hands([ {A,X},{B,X},{C,X},{D,X},{E,X}]) when
+    B == A+1,
+    C == B+1,
+    D == C+1,
+    E == D+1 ->
+    straight_flush
+
+//hands([ {X,_},{X+1,_},{X+2,_},{X+3,_},{X+4,_}]) ->
+hands([ {A,_},{B,_},{C,_},{D,_},{E,_}]) when
+    B == A+1,
+    C == B+1,
+    D == C+1,
+    E == D+1 ->
+    straight
+
+
+hands([ {_,X},{_,X},{_,X},{_,X},{_,X}]) ->
+    flush
+
+hands([ {A,_},{A,_},{A,_},{A,_},_]) -> four_cards
+hands([ _,{A,_},{A,_},{A,_},{A,_}]) -> four_cards
+
+hands([ {A,_},{A,_},{A,_},{B,_},{B,_}]) -> fullhouse
+hands([ {A,_},{A,_},{B,_},{B,_},{B,_}]) -> fullhouse
+
+hands([ {A,_},{A,_},{A,_},_,_]) -> three_cards
+hands([ _,{A,_},{A,_},{A,_},_]) -> three_cards
+hands([ _,_,{A,_},{A,_},{A,_}]) -> three_cards
+
+hands([ {A,_},{A,_},{B,_},{B,_},_]) -> two_pair
+hands([ {A,_},{A,_},_,{B,_},{B,_}]) -> two_pair
+hands([ _,{A,_},{A,_},{B,_},{B,_}]) -> two_pair
+
+hands([ {A,_},{A,_},_,_,_]) -> one_pair
+hands([ _,{A,_},{A,_},_,_]) -> one_pair
+hands([ _,_,{A,_},{A,_},_]) -> one_pair
+hands([ _,_,_,{A,_},{A,_}]) -> one_pair
+

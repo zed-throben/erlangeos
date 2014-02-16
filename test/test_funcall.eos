@@ -1,0 +1,47 @@
+test()->
+    [0,1,2,3] = lists.reverse() <| [3,2,1,0]
+    [0,1,2,3] = lists.reverse <| [3,2,1,0]
+
+    [0,1,2,3] = lists.reverse() <| lists.flatten( [3,[2,1],0] )
+    [0,1,2,3] = lists.reverse() <| lists.flatten() <| [3,[2,1],0]
+    [0,1,2,3] = lists.reverse <| lists.flatten <| [3,[2,1],0]
+
+    [0,1,2,3] =  lists.flatten( [3,[2,1],0] ) |> lists.reverse()
+    [0,1,2,3] =  lists.flatten( [3,[2,1],0] ) |> lists.reverse
+
+    [0,1,2,3] = [3,[2,1],0] |> lists.flatten() |> lists.reverse()
+    [0,1,2,3] = [3,[2,1],0] |> lists.flatten |> lists.reverse
+
+    [100,101,102,103] = lists.map([0,1,2,3]) do |X| X+100
+    [1,2,3,4] = lists.map([0,1,2,3]) <| fun(X)->X+1
+
+    [1,2,3,4] = lists.map([0,1,2,3])
+                do |X| Y=1
+                       X+Y
+
+    [1,2,3,4] = lists.map([0,1,2,3]) <|
+                fun(X)->Y=1
+                        X+Y
+
+    [4,3,2,1] = lists.reverse() <| lists.map([0,1,2,3]) do |X| X+1
+
+    [13,12,11,10] = lists.map([0,1,2,3]) do |X| X+10
+                    |> lists.reverse()
+
+    [13,12,11,10] = lists.map([0,1,2,3])
+                    do |X| X+10
+                    |> lists.reverse()
+
+
+    [6,4,2] = lists.reverse( lists.map( fun(X)->X*2 end,[1,2,3] ) )
+    [6,4,2] = lists.reverse <| lists.map( fun(X)->X*2 end,[1,2,3] )
+    [6,4,2] = lists.reverse <| lists.map( (\ (X)->X*2 ),[1,2,3] )
+    [6,4,2] = lists.reverse <| lists.map( [1,2,3] ) do |X| X*2
+    [6,4,2] = lists.map( [1,2,3] ) do |X| X*2
+              |> lists.reverse
+
+    [2,4,6] = lists.map(
+                fun(X)->X*2
+                [1,2,3] )    
+
+ 

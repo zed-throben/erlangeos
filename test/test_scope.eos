@@ -1,0 +1,29 @@
+test()-> 
+    let X = lists.map([0,1,2,3])
+                do |X| Y=1
+                       X+Y
+    in
+        [1,2,3,4] = X
+
+    let X = lists.map([0,1,2,3])
+                do |X| Y=1
+                       X+Y
+        Y = lists.map([0,1,2,3])
+                do |X| Y=2
+                       X+Y
+    in
+        [1,2,3,4] = X
+        [2,3,4,5] = Y
+
+/*
+    local
+        X=10
+        Y=20
+        {10,20} = {X,Y}
+
+    local
+        X=100
+        Y=200
+        {100,200} = {X,Y}
+*/
+    

@@ -1,0 +1,38 @@
+test()->
+    testN(0)
+
+testN(N)->
+    eosstd.puts( @"test ##{N}" )
+    if test(N) != eof
+    then testN(N+1)
+
+//
+
+test(0)->
+    let A = 10 in
+    A+10
+
+test(1)->
+    let A = 10 in
+    let B = 20 in
+        A+B
+
+test(2)->
+    let A = 10
+        B = 20 in
+        A+B
+
+test(3)->
+    let A = 10
+        B = 20
+    in
+    A+B
+
+test(4)->
+    let A = 10
+        {X,Y} = {100,200}
+    in
+    A+X+Y
+
+test(5)->eof
+
