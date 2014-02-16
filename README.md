@@ -365,9 +365,8 @@ is similer to rpc:call('192.168.0.2@main',main,hello,[world])
 
 
 ##coming later
--monad,computation expression
--lisp like macro
--
+- monad,computation expression
+- lisp like macro
 
 #samples
 check it out "erlangeos/test/" and "erlangeos/sample/".
