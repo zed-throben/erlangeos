@@ -316,26 +316,30 @@ If source file has no export definition, ErlangEOS adds "-compile(export_all)." 
 ###EOS object initialization
 
 ```erlang
-#<TYPE>{
-  key=value
-  key=value
-}
+    #<TYPE>{
+      key=value
+      key=value
+    }
 ```
 ---> eos:new(TYPE,[{key,value},{key,value}])
 
 
 ###object using Erlang's process
 
-#<eos_obj>{
-  key=value
-  key=value
-}
+```erlang
+    #<eos_obj>{
+      key=value
+      key=value
+    }
+```
 
 ###object using ETS
-#<eos_ets>{
-  key=value
-  key=value
-}
+```erlang
+    #<eos_ets>{
+      key=value
+      key=value
+    }
+```
 
 
 ###EOS member access
@@ -348,10 +352,10 @@ If source file has no export definition, ErlangEOS adds "-compile(export_all)." 
 
 ###RPC using EOS
 ```erlang
-RPC = #<eos_rpc>{
-  node=:192.168.0.2@main
-  module=main
-}
+    RPC = #<eos_rpc>{
+      node=:192.168.0.2@main
+      module=main
+    }
 RPC.hello(world)
 ```
 is similer to rpc:call('192.168.0.2@main',main,hello,[world])
