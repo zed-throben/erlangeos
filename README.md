@@ -1,4 +1,4 @@
-#ErlangEOS ver 0.01a - 2014/02/16(JST)
+#ErlangEOS ver 0.01b - 2014/02/18(JST)
 
 A dialect of Erlang that uses indentation like Python, and has many improvement like ErlangObjectSystem.
 
