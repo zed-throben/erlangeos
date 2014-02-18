@@ -49,7 +49,7 @@ msgproc(Module)->
 			Module;
 
 		{From,put,Key,Value} ->
-			From ! {result,erlang:put(Key,Value)},
+			From ! {result,erlang:put(Key,Value),Value},
 			Module;
 
 		{From,set_dict,Dic} ->
@@ -134,23 +134,32 @@ start_(Module,F)->
 
 
 invoke(?eos(?OBJTYPE,{Module,Pid})=Obj,Method,Param)->
-	%io:format("invoke ~p ~p ~p\n",[Obj,Method,Param]),
-	case send_and_receive( Obj,{self(),invoke,Method,Param} ) of
-		{ok,Res} -> Res;
-		{exception,EType,EMsg} ->
-			case EType of
-				error -> error(EMsg);
-				exit  -> exit(EMsg);
-				throw -> throw(EMsg)
-			end
-	end.
+	%io:format("invoke ~p:~p ~p ~p ~p\n",[Pid,self(), Obj,Method,Param]),
+    if  Pid =:= self() -> ?invoke(Module,Method,Param);
+        true ->
+        	case send_and_receive( Obj,{self(),invoke,Method,Param} ) of
+        		{ok,Res} -> Res;
+        		{exception,EType,EMsg} ->
+        			case EType of
+        				error -> error(EMsg);
+        				exit  -> exit(EMsg);
+        				throw -> throw(EMsg)
+        			end
+        	end
+    end.
 
 
 get_slot(?eos(?OBJTYPE,{Module,Pid})=Obj,Key)->
-	send_and_receive( Obj,{self(),get,Key} ).
+	%io:format("get_slot ~p:~p ~p\n",[Pid,self(), Key]),
+    if  Pid =:= self() -> erlang:get(Key);
+        true -> send_and_receive( Obj,{self(),get,Key} )
+    end.
 
 set_slot(?eos(?OBJTYPE,{Module,Pid})=Obj,Key,Value)->
-	send_and_receive( Obj,{self(),put,Key,Value} ).
+	%io:format("set_slot ~p:~p ~p=~p\n",[Pid,self(), Key,Value]),
+    if  Pid =:= self() -> erlang:put(Key,Value),Value;
+    	true -> send_and_receive( Obj,{self(),put,Key,Value} )
+    end.
 
 
 %

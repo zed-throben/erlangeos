@@ -359,14 +359,14 @@ lex([],Acc,{Line,Row} = LnRw)->
 	lists:reverse( Acc );
 
 %
-lex([$<,$<,${,$},$>,$> |T],Acc,{Line,Row} = LnRw)->
-	lex(T,[?token(LnRw,'<<{}>>')|Acc],{Line,Row+6} );
-
-lex([$<,$<,${ |T],Acc,{Line,Row} = LnRw)->
-	lex(T,[?token(LnRw,'<<{')|Acc],{Line,Row+3} );
-
-lex([$},$>,$> |T],Acc,{Line,Row} = LnRw)->
-	lex(T,[?token(LnRw,'}>>')|Acc],{Line,Row+3} );
+%lex([$<,$<,${,$},$>,$> |T],Acc,{Line,Row} = LnRw)->
+%	lex(T,[?token(LnRw,'<<{}>>')|Acc],{Line,Row+6} );
+%
+%lex([$<,$<,${ |T],Acc,{Line,Row} = LnRw)->
+%	lex(T,[?token(LnRw,'<<{')|Acc],{Line,Row+3} );
+%
+%lex([$},$>,$> |T],Acc,{Line,Row} = LnRw)->
+%	lex(T,[?token(LnRw,'}>>')|Acc],{Line,Row+3} );
 
 %
 lex([$#,${ |T],Acc,{Line,Row} = LnRw)->

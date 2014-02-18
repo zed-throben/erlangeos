@@ -1,0 +1,13 @@
+foo(N)->
+    Obj = #<eos_obj>{
+        accumulator=N
+    }
+    fun(I)->
+        Obj.accumulator := Obj.accumulator + I
+
+test()->
+    Foo = foo(0)
+    1 = Foo(1)
+    2 = Foo(1)
+    12 = Foo(10)
+    22 = Foo(10)

@@ -256,3 +256,11 @@ erlsrc_to_module(CompiledSrc)->
     code:load_binary(ModuleName, "nofile", Binary).
 
 
+load_eos_module(SrcPath)->
+    Module = erleos:path_to_module(SrcPath),
+    Src = load(SrcPath),
+    case erleos:compile(Module,Src) of
+        {ok,ErlSrc} ->
+            erlsrc_to_module(ErlSrc);
+        _ -> []
+    end.

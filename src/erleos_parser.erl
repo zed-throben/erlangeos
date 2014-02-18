@@ -639,11 +639,11 @@ parse_method(Name,LnRw)->
 
 
 
-paren( ?token(LnRw,'<<{') )->
-    %KeyValues = parse_dic('}>>'),
-    KeyValues = parse_record(<<"dictionary">>, '}>>','='),
-    expect('}>>'),
-    ?token(LnRw,'dictionary',KeyValues);
+%paren( ?token(LnRw,'<<{') )->
+%    %KeyValues = parse_dic('}>>'),
+%    KeyValues = parse_record(<<"dictionary">>, '}>>','='),
+%    expect('}>>'),
+%    ?token(LnRw,'dictionary',KeyValues);
 
 paren( ?token(LnRw,'#{') )->
     %KeyValues = parse_dic('}'),
@@ -652,12 +652,18 @@ paren( ?token(LnRw,'#{') )->
     ?token(LnRw,'proplist',KeyValues);
 
 paren( ?token(LnRw,'#<') )->
-    TypeName = extract_until('>'),
+    [TypeName] = extract_until('>'),
+    Param = case cur_token() of
+        ?t('(') ->
+            next(),
+            parse_param();
+
+        _ -> []
+    end,
     expect('{'),
-    %KeyValues = parse_dic('}'),
     KeyValues = parse_record(<<"newobj">>, '}','='),
     expect('}'),
-    ?token(LnRw,'newobj',{TypeName,KeyValues});
+    ?token(LnRw,'newobj',{TypeName,Param,KeyValues});
 
 paren( ?token(LnRw,'(') )->
     Param = parse_paren(),

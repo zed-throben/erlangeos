@@ -80,5 +80,6 @@ get_slot(?DICTIONARY=Obj,Key) ->
         _ -> undefined
     end.
 
-create(Type,Params)->
-    erlang:apply(Type,create,[Params]).
+new(Type,Option,Params)->
+    %io:format("#eos:new ~p ~p ~p\n",[Type,Option,Params]),
+    erlang:apply(Type,new,[Option,Params]).

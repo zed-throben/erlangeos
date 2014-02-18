@@ -1,5 +1,4 @@
 #ErlangEOS ver 0.01a - 2014/02/16(JST)
-=========
 
 A dialect of Erlang that uses indentation like Python, and has many improvement like ErlangObjectSystem.
 
@@ -322,7 +321,22 @@ If source file has no export definition, ErlangEOS adds "-compile(export_all)." 
   key=value
 }
 ```
----> eos:create(TYPE,[{key,value},{key,value}])
+---> eos:new(TYPE,[{key,value},{key,value}])
+
+
+###object using Erlang's process
+
+#<eos_obj>{
+  key=value
+  key=value
+}
+
+###object using ETS
+#<eos_ets>{
+  key=value
+  key=value
+}
+
 
 ###EOS member access
 
@@ -334,7 +348,7 @@ If source file has no export definition, ErlangEOS adds "-compile(export_all)." 
 
 ###RPC using EOS
 ```erlang
-RPC = #<eos_rpcobj>{
+RPC = #<eos_rpc>{
   node=:192.168.0.2@main
   module=main
 }
@@ -361,6 +375,24 @@ is similer to rpc:call('192.168.0.2@main',main,hello,[world])
     alpha = Dict.a
     beta  = Dict.b
     gamma = Dict.c
+
+    //
+
+    PropList2 = #{
+        a=alpha
+        b=beta
+        c=gamma
+    }
+
+    PropList = PropList2
+
+    Dict2 = #<dict>{
+        a=alpha
+        b=beta
+        c=gamma
+    }
+
+    Dict = Dict2
 ```
 
 

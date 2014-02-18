@@ -22,5 +22,15 @@ map(Dict,F)->
 fold(Dict,F,Acc)->
 	dict:fold(F,Acc,Dict).
 
+new(_Option,Params)->
+	lists:foldl(
+		fun({Key,Value},Dict)->
+			dict:store(Key,Value,Dict)
+		end
+		,dict:new()
+		,Params
+	).
+
+
 
 

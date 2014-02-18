@@ -1,0 +1,15 @@
+// https://github.com/stevedekorte/io/blob/master/samples/misc/Account.io
+
+start()->
+    Account = #<eos_obj>{
+        balance = 0.0
+        deposit = method(V)-> This.balance := This.balance + V
+        show    = method()-> @"Account balance: $#{This.balance}\n"
+    }
+
+    io.format( @"Inital: #{Account.show()}") 
+
+    io.format( "Depositing $10\n" )
+    Account.deposit(10.0)
+
+    io.format( @"Final: #{Account.show()}" )

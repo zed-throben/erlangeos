@@ -15,16 +15,21 @@ test() ->
     eos_loop:while( fun()->io:format(eosstd:fmt("No.~s\n",[eosstd:to_str(get('$a'))])),
     put('$a' , get('$a') + 1 ) end,fun()->get('$a') < 10  end ),
     put('$a' , 0),
-    {ok,4} = eos_loop:while( fun()->
+    put('$sum' , 0),
+    {ok,4} = eos_loop:while( fun()->put('$a' , get('$a') + 1 ),
+    io:format(eosstd:fmt("No.~s\n",[eosstd:to_str(get('$a'))])),
+    
     (fun()->EOSSYS@t_7 = (get('$a') rem 2 ) == 0 ,
     if
         EOSSYS@t_7 ->
+            io:format(eosstd:fmt("No.~s continue\n",[eosstd:to_str(get('$a'))])),
             eos_loop:continue();
         true -> (fun()->EOSSYS@t_8 = get('$a') >= 5 ,
         if
             EOSSYS@t_8 ->
-                eos_loop:break({ok,get('$a')});
+                io:format(eosstd:fmt("No.~s break\n",[eosstd:to_str(get('$a'))])),
+                eos_loop:break({ok,get('$sum')});
             true -> []
         end end)()
     end end)(),
-    put('$a' , get('$a') + 1 ) end,fun()->get('$a') < 10  end ).
+    put('$sum' , get('$sum') + get('$a') ) end,fun()->get('$a') < 10  end ).

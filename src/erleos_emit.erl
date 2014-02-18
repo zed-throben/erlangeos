@@ -407,20 +407,26 @@ e( ?t('bind',{Name,Expr,Block}) )->
 
 %
 
-e( ?t(dictionary,KeyValues) )->
-    p("["),
-    emit_kvlist(KeyValues),
-    p("]");
+%e( ?t(dictionary,KeyValues) )->
+%    p("["),
+%    emit_kvlist(KeyValues),
+%    p("]");
 
 e( ?t(proplist,KeyValues) )->
     p("["),
     emit_kvlist(KeyValues),
     p("]");
 
-e( ?t(newobj,{TypeName,KeyValues}) )->
-    p("eos:create("),
-    e(TypeName),
+e( ?t(newobj,{TypeName,Param,KeyValues}) )->
+    p("eos:new("),
+    ModifiedTypeName = case TypeName of
+        ?token(_,symbol,dict) -> ?token(undefined,symbol,eos_dictobj);
+        _ -> TypeName
+    end,
+    e(ModifiedTypeName),
     p(",["),
+    emit_list(Param),
+    p("],["),
     emit_kvlist(KeyValues),
     p("])");
 
@@ -501,7 +507,7 @@ e( ?t(tuple,List) )->
     emit_list(List),
     p("}");
 
-e( ?t(fmt_stringlist,String)=T ) ->
+e( ?token(LnRw,fmt_stringlist,String)=T ) ->
     try
         {Fmt,Params} = erleos_formatted_string:convert(String),
         p("eosstd:fmt(\"~s\",[",[Fmt]),
@@ -509,12 +515,12 @@ e( ?t(fmt_stringlist,String)=T ) ->
         p("])")
     catch
         throw:X ->
-            erleos:compile_error( compile_error,eosstd:fmt("invalid formatted string: ~p",[T]) )
+            erleos:compile_error( compile_error,LnRw,eosstd:fmt("invalid formatted string: ~p",[T]) )
     end;
 
 
 
-e( ?t(fmt_binarystring,String)=T ) ->
+e( ?token(LnRw,fmt_binarystring,String)=T ) ->
     try
         {Fmt,Params} = erleos_formatted_string:convert(String),
         p("list_to_binary( eosstd:fmt(\"~s\",[",[Fmt]),
@@ -522,7 +528,7 @@ e( ?t(fmt_binarystring,String)=T ) ->
         p("]) )")
     catch
         throw:X ->
-            erleos:compile_error( compile_error,eosstd:fmt("invalid formatted binary string: ~p",[T]) )
+            erleos:compile_error( compile_error,LnRw,eosstd:fmt("invalid formatted binary string: ~p",[T]) )
     end;
 
 e( ?t(erlang_direct,Str) ) ->
@@ -702,6 +708,10 @@ e( ?t(':=',{ ?t(membervar,Varname),B}) )->
     p("eos:set_slot(This,'~s' , ",[Varname]),
     e(B),
     p(")");
+
+e( ?token(LnRw,':=',{A,B}) )->
+    erleos:compile_error( compile_error,LnRw,eosstd:fmt("variable assignment is only permmited to object and global variables.: ~p :=",[A]) );
+
 
 %
 

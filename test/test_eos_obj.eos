@@ -1,0 +1,57 @@
+foo(N)->
+    Obj = #<eos_obj>{
+        accumulator=N
+    }
+    fun(I)->
+        Obj.accumulator := Obj.accumulator + I
+
+foo2(N)->
+    Obj = #<eos_obj>{
+        accumulator=N
+        f=method(I)->
+            This.accumulator := This.accumulator + I
+    }
+    (\ (I)->Obj.f(I))
+
+foo3(N)->
+    Obj = #<eos_obj>{ accumulator=N }
+    (\ (I)-> Obj.accumulator := Obj.accumulator + I)
+
+
+test()->
+    A = #<eos_obj>{
+        uho = method()->io.format("iiotoko\n",[])
+        hello = method(X)->io.format("hello ~s\n",[X])
+        set = method(X)->
+                This.a := X
+                This.b := X*2
+        add = method()->
+                This.a + This.b
+    }
+    
+    io.format("~p\n",[A.hello])
+    A.hello("world")
+    A.uho()
+
+    A.set(10)
+    30 = A.add()
+
+    //
+
+    Foo = foo(0)
+    1 = Foo(1)
+    2 = Foo(1)
+    12 = Foo(10)
+    22 = Foo(10)
+
+    Foo2 = foo2(0)
+    1 = Foo2(1)
+    2 = Foo2(1)
+    12 = Foo2(10)
+    22 = Foo2(10)
+
+    Foo3 = foo3(0)
+    1 = Foo3(1)
+    2 = Foo3(1)
+    12 = Foo3(10)
+    22 = Foo3(10)

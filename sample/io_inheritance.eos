@@ -1,0 +1,27 @@
+// https://github.com/stevedekorte/io/blob/master/samples/misc/Inheritance.io
+
+start()->
+    // Define a Dog object
+
+    Dog = #<eos_obj>{
+        barkPhrase = "woof!"
+        bark = method()-> io.format( @"#{This.barkPhrase}\n" )
+    }
+
+    Chiwawa = Dog.clone()
+    Chiwawa.barkPhrase := "yip!"
+
+    io.format("Dog bark: ")
+    Dog.bark()
+
+    io.format("Chiwawa bark: ")
+    Chiwawa.bark()
+
+    // make an instance
+    MyChiwawa = Chiwawa.clone()
+    MyChiwawa.barkPhrase := "Yo Quiero Taco Bell"
+
+    io.format("myChiwawa bark: ")
+    MyChiwawa.bark()
+
+

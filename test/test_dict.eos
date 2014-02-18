@@ -16,4 +16,20 @@ test()->
     beta  = Dict.b
     gamma = Dict.c
     
-    
+    //
+
+    PropList2 = #{
+        a=alpha
+        b=beta
+        c=gamma
+    }
+
+    PropList = PropList2
+
+    Dict2 = #<dict>{
+        a=alpha
+        b=beta
+        c=gamma
+    }
+
+    Dict = Dict2

@@ -17,21 +17,26 @@ start()->
 
 loop(Env)->
 	Line = io:get_line("eos> "),
-
-	case trim(Line) of
-		":exit" ->
+	Token = string:tokens(trim(Line)," \t"),
+	%io:format("token = ~p\n",[Token]),
+	case Token of
+		[":exit"] ->
 			ok;
-		":clear" ->
+		[":clear"] ->
 			start();
 
-		":verbose"->
+		[":verbose"]->
 			loop( Env#env{verbose=true} );
 
-		":quiet"->
+		[":quiet"]->
 			loop( Env#env{verbose=false} );
 
-		":help" ->
+		[":help"] ->
 			io:format(":exit :clear :help\n"),
+			loop( Env );
+
+		[":load",Filename]->
+			Src = erleos:load_eos_module(Filename),
 			loop( Env );
 
 		_ ->

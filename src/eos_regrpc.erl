@@ -1,4 +1,4 @@
--module(eos_regrpcobj).
+-module(eos_regrpc).
 -compile(export_all).
 -include("eos.hrl").
 
@@ -8,11 +8,11 @@ start()->
 register(Name,Address)->
 	ets:insert(registered_nodes,{Name,Address}).
 
-invoke(?eos(eos_regrpcobj,{Node,Module}),Method,Params)->
+invoke(?eos(eos_regrpc,{Node,Module}),Method,Params)->
 	[{Node,Address}] = ets:lookup(registered_nodes,Node),
     rpc:call(Address,Module,Method,Params);
 
-invoke(?eos(eos_regrpcobj,{Node,Module,Timeout}),Method,Params)->
+invoke(?eos(eos_regrpc,{Node,Module,Timeout}),Method,Params)->
 	[{Node,Address}] = ets:lookup(registered_nodes,Node),
     rpc:call(Address,Module,Method,Params,Timeout).
 
