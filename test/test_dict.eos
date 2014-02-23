@@ -33,3 +33,18 @@ test()->
     }
 
     Dict = Dict2
+
+    //
+
+    Dict3 = Dict.a := aaa
+    Dict4 = Dict3.d := ddd
+    aaa = Dict4.a
+    ddd = Dict4.d
+
+    Dict5 = Dict4.map() do |Key,Value|
+                            @"#{Key} -> #{Value}"
+    "a -> aaa" = Dict5.a
+    "b -> beta" = Dict5.b
+    "c -> gamma" = Dict5.c
+    "d -> ddd" = Dict5.d
+

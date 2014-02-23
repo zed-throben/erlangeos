@@ -26,7 +26,18 @@ to_str(X)->
 
 fmt(Fmt,Param)->
 	lists:flatten( io_lib:format(Fmt,Param)).
+fmt(Fmt)->
+    to_list(Fmt).
 
+fmt_bin(Fmt,Param)->
+    list_to_binary( fmt(Fmt,Param) ). 
+fmt_bin(Fmt)->
+    list_to_binary( fmt(Fmt) ). 
+
+fmt_atom(Fmt,Param)->
+    list_to_atom( fmt(Fmt,Param) ). 
+fmt_atom(Fmt)->
+    list_to_atom( fmt(Fmt) ). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

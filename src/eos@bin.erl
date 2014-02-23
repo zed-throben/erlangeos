@@ -1,4 +1,4 @@
--module(eos_binobj).
+-module(eos@bin).
 -compile(export_all).
 
 length(Bin)->

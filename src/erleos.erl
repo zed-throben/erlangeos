@@ -60,7 +60,7 @@ use(Obj,F)->
     Ret.
 
 
-compile_(Module,Src,Options)->
+compile_(Emitter,Module,Src,Options)->
     A = erleos_lexer:lex(Src),
 
     Verbose = lists:member(verbose,Options),
@@ -127,22 +127,26 @@ compile_(Module,Src,Options)->
 
     %io:format("modified src = ~p\n",[ModifiedSrc]),
 
-    use( erleos_emit:start(),
+    use( Emitter,
         fun(Emitter)->
             %io:format("AAAAA\n"),
-            erleos_emit:invoke(Emitter,init,[fun(X)->X end]),
+            eos:invoke(Emitter,init,[fun(X)->X end]),
             %io:format("BBBBB\n"),
 
             %HdSrc = "-import(eosstd).\n",  // import,defineは、自分で処理しなければならない
             HdSrc = "",
-            erleos_emit:invoke(Emitter,compile,[HdSrc,ModifiedSrc])
+            eos:invoke(Emitter,compile,[HdSrc,ModifiedSrc])
 
         end
     ).
 
+
 compile(Module,Src,Options)->
+    compile(erleos_emit:start(),Module,Src,Options).
+
+compile(Emitter,Module,Src,Options)->
     erleos:try_block( fun()->
-        {ok,compile_(Module,Src,Options)}
+        {ok,compile_(Emitter,Module,Src,Options)}
     end,
     "compile"
     ).
@@ -150,8 +154,10 @@ compile(Module,Src,Options)->
 compile(Module,Src)->
     compile(Module,Src,[]).
 
-
 translate_block(Src)->
+    translate_block(erleos_emit:start(),Src).
+
+translate_block(Emitter,Src)->
     {ok,A} = try_block(
         fun()->
             {ok,erleos_lexer:lex(Src)}
@@ -164,10 +170,10 @@ translate_block(Src)->
             erleos_parser:invoke(Parser,parse_block,[<<"translate block">>])
         end
     ),
-    use( erleos_emit:start(),
+    use( Emitter,
         fun(Emitter)->
-            erleos_emit:invoke(Emitter,init,[fun(S)->[] end]),
-            erleos_emit:invoke(Emitter,exec_emit_block,["",Block])
+            eos:invoke(Emitter,init,[fun(S)->[] end]),
+            eos:invoke(Emitter,exec_emit_block,["",Block])
         end
     ).
 
@@ -175,10 +181,37 @@ translate_block(Src)->
 path_to_module(Path)->
     to_atom( filename:basename(Path,".eos") ).
 
+%load(Filename)->
+%    io:format("# filename = ~s\n",[Filename]),
+%    {ok,Binary} = file:read_file( Filename ),
+%    unicode:characters_to_list(Binary,utf8).
+
 load(Filename)->
-    io:format("# filename = ~s\n",[Filename]),
-    {ok,Binary} = file:read_file( Filename ),
-    unicode:characters_to_list(Binary,utf8).
+    {Path,Binary} = lists:foldl(
+        fun(Path,Acc)->
+            if Acc /= [] -> Acc;
+                true ->
+                    case file:read_file( Path ) of
+                        {ok,Binary} -> {Path,Binary};
+                        _ -> []
+                    end
+            end
+        end,
+        [],
+        [
+            Filename++".eos",
+            Filename,
+            Filename++".erl"
+        ]
+    ),
+    Type = case filename:extension(Path) of
+        ".eos" -> eos;
+        ".erl" -> erl
+    end,
+    io:format("# load source: ~s\n",[Path]),
+    String = unicode:characters_to_list(Binary,utf8),
+    %io:format("###unicode ~p\n",[String]),
+    {Type,String}.
 
 trim_dir(Dir)->
     case lists:last(Dir) of
@@ -223,7 +256,7 @@ compile_file(SrcPath)->
 compile_file(SrcPath,DstPath)->
     Module = erleos:path_to_module(SrcPath),
     %io:format("~s : ~s --------------------------------------------\n",[Module,Module]),
-    Src = load(SrcPath),
+    {eos,Src} = load(SrcPath),
     case erleos:compile(Module,Src) of
         {ok,ErlSrc} ->
             %io:format("SRC = ~p\n",[ErlSrc]),
@@ -256,11 +289,12 @@ erlsrc_to_module(CompiledSrc)->
     code:load_binary(ModuleName, "nofile", Binary).
 
 
-load_eos_module(SrcPath)->
+load_source_and_compile(SrcPath)->
     Module = erleos:path_to_module(SrcPath),
-    Src = load(SrcPath),
-    case erleos:compile(Module,Src) of
-        {ok,ErlSrc} ->
-            erlsrc_to_module(ErlSrc);
-        _ -> []
-    end.
+    {Type,Src} = load(SrcPath),
+    ErlSrc = case Type of
+        eos -> {ok,Res} = erleos:compile(Module,Src),Res;
+        erl -> Src
+    end,
+    %io:format("Src = ~p\n",[ErlSrc]),
+    erlsrc_to_module(ErlSrc).

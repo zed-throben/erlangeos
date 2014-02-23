@@ -1,12 +1,12 @@
 foo(N)->
-    Obj = #<eos_obj>{
+    Obj = #<obj>{
         accumulator=N
     }
     fun(I)->
         Obj.accumulator := Obj.accumulator + I
 
 foo2(N)->
-    Obj = #<eos_obj>{
+    Obj = #<obj>{
         accumulator=N
         f=method(I)->
             This.accumulator := This.accumulator + I
@@ -14,12 +14,12 @@ foo2(N)->
     (\ (I)->Obj.f(I))
 
 foo3(N)->
-    Obj = #<eos_obj>{ accumulator=N }
+    Obj = #<obj>{ accumulator=N }
     (\ (I)-> Obj.accumulator := Obj.accumulator + I)
 
 
 test()->
-    A = #<eos_obj>{
+    A = #<obj>{
         uho = method()->io.format("iiotoko\n",[])
         hello = method(X)->io.format("hello ~s\n",[X])
         set = method(X)->

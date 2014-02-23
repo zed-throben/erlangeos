@@ -1,10 +1,10 @@
 start()->
-    RPC1 = #<eos_rpc>{
+    RPC1 = #<rpc>{
         node=:192.168.0.2@main
         module=main
     }
     RPC1.hello("world")
 
-    RPC2 = #<eos_rpc>{ node=:192.168.0.3@main,module=main }
+    RPC2 = #<rpc>{ node=:192.168.0.3@main,module=main }
     RPC2.hello("world")
 

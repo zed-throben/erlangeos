@@ -1,4 +1,4 @@
--module(eos_dictobj).
+-module(eos@dict).
 -compile(export_all).
 
 length(Dict)->
@@ -32,5 +32,14 @@ new(_Option,Params)->
 	).
 
 
+
+set_slot(Obj,Key,Value)->
+	dict:store(Key,Value,Obj).
+
+get_slot(Obj,Key) ->
+    case dict:find(Key,Obj) of
+        {ok,Value} -> Value;
+        _ -> undefined
+    end.
 
 

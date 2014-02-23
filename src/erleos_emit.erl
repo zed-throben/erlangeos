@@ -419,11 +419,7 @@ e( ?t(proplist,KeyValues) )->
 
 e( ?t(newobj,{TypeName,Param,KeyValues}) )->
     p("eos:new("),
-    ModifiedTypeName = case TypeName of
-        ?token(_,symbol,dict) -> ?token(undefined,symbol,eos_dictobj);
-        _ -> TypeName
-    end,
-    e(ModifiedTypeName),
+    e(TypeName),
     p(",["),
     emit_list(Param),
     p("],["),
@@ -431,8 +427,11 @@ e( ?t(newobj,{TypeName,Param,KeyValues}) )->
     p("])");
 
 e( ?t(paren,List) )->
+    %io:format("****emit paren = ~p\n",[List]),
     p("("),
-    emit(List),
+    if is_list(List)->emit(List);
+        true->e(List)
+    end,
     p(")");
 
 e( ?t(list_comprehension,{A,B}) )->
@@ -735,6 +734,13 @@ e( ?t(n_int,{N,X}) )->
 e( ?t(e_int,{X,N}) )->
     p("~we~w",[X,N]);
 
+% R:8 
+e( ?t(var_ext,{X,Ext}) )->
+    %io:format("###var_ext1 = ~p\n",[X]),
+    %io:format("###var_ext2 = ~p\n",[Ext]),
+    p("~s:",[X]),
+    e(Ext);
+
 % reference immutable local variable
 e( ?t(var,X) )->
     p("~s",[X]);
@@ -752,6 +758,13 @@ e( ?t(objpath,[Obj,Member]) )->
 
 e( ?t(membervar,X) )->
     p("eos:get_slot(This,'~s')",[X]);
+
+e( ?t(rec_modify,{Var,RecordName,KeyValues} ) )->
+    %io:format("*******rec_modify ~p ~p ~p\n",[Var,RecordName,KeyValues] ),
+    e(Var),
+    p("#~s{",[RecordName]),
+    emit_dictionary(KeyValues),
+    p("}");
 
 e( ?t(recpath,{Obj,Rec,Member}) )->
     %p("~s#~s.~s",[Obj,Rec,Member]);

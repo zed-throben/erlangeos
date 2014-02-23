@@ -136,10 +136,20 @@ expect_type(Type)->
             erleos:compile_error(expect,LnRw,eosstd:fmt("~p is expected, but ~p",[Type,X]))
     end.
 
-
 emit(X)->
     %trace(emit,X),
     eos_var:lunshift(emit,X).
+
+
+symbolof( ?token(LnRw,symbol,Sym) )->
+    Sym;
+symbolof( ?token(LnRw,quotedsymbol,Sym) )->
+    Sym.
+
+modtoken( ?token(LnRw,symbol,Sym),NewSym )->
+    ?token(LnRw,symbol,eosstd:to_atom(NewSym) );
+modtoken( ?token(LnRw,quotedsymbol,Sym),NewSym )->
+    ?token(LnRw,quotedsymbol,eosstd:to_atom(NewSym) ).
 
 %
 % param (Expr,Expr..)
@@ -478,6 +488,7 @@ parse_record_(Name,Terminator,Delimiter,BlockRow,Acc)->
 
         CurToken ->
             {_,Row} = lnrw( CurToken ),
+            %io:format("@@@ BlockRow = ~p, Row = ~p, CurToken = ~p, \n",[BlockRow,Row,CurToken]),
             if Row =/= BlockRow -> lists:reverse(Acc);
                 true ->
                     Pattern = extract_until(Delimiter),
@@ -663,10 +674,11 @@ paren( ?token(LnRw,'#<') )->
     expect('{'),
     KeyValues = parse_record(<<"newobj">>, '}','='),
     expect('}'),
-    ?token(LnRw,'newobj',{TypeName,Param,KeyValues});
+    ?token(LnRw,'newobj',{modtoken(TypeName,eosstd:fmt_atom("eos@~s",[symbolof(TypeName)])),Param,KeyValues});
 
 paren( ?token(LnRw,'(') )->
     Param = parse_paren(),
+    %io:format("****paren = ~p\n",[Param]),
     ?token(LnRw,'paren',Param);
 
 paren( ?token(LnRw,'[') )->
@@ -748,13 +760,24 @@ path(A)->
         %    [A,M,B];
 
         %% Varname#Record.member
-        ?token({Line2,Row2},record_name,_) = Rec->
+        ?token({Line2,Row2},record_name,RecordName) = Rec->
+            %io:format("**** Varname#Record.member\n"),
             next(),
-            expect('.'),
+            case cur_token() of
+                ?t('.') ->
+                    next(),
+                    B = cur_token(),
+                    next(),
+                    ?token(LnRw,recpath,{A,Rec,B});
 
-            B = cur_token(),
-            next(),
-            ?token(LnRw,recpath,{A,Rec,B});
+                ?t('{') ->
+                    next(),
+                    KeyValues = parse_record(<<"modify record">>, '}','='),
+                    %io:format("**** KEYVALS = ~p\n",[KeyValues]),
+                    expect('}'),
+                    ?token(LnRw,'rec_modify',{A,RecordName,KeyValues})
+
+            end;
 
         ?token({Line2,Row2},':') ->
             next(),

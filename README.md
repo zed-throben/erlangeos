@@ -1,4 +1,4 @@
-#ErlangEOS ver 0.01b - 2014/02/18(JST)
+#ErlangEOS ver 0.01c - 2014/02/23(JST)
 
 A dialect of Erlang that uses indentation like Python, and has many improvement like ErlangObjectSystem.
 
@@ -11,9 +11,11 @@ A dialect of Erlang that uses indentation like Python, and has many improvement 
 - Integration with "rebar" for ease.
 
 #License
-- distributed under BSD LICENSE.  
-Copyright (c) 2014, zed(http://throben.org)  
-All rights reserved.  
+- distributed under BSD LICENSE.
+```
+Copyright (c) 2014, zed(http://throben.org)
+All rights reserved.
+```
 
 #online demo
 http://throben.org/erleos/erleos_online_compiler.html
@@ -81,15 +83,15 @@ This command uses "rebar create-app appid=APPID" internally.
 
 ###compile .eos to .erl
 
-- eos c  
+- eos c
 converts ./src/*.eos -> ./src/*.erl
 
-- eos c SRCDIR  
+- eos c SRCDIR
 converts SRCDIR/*.eos -> SRCDIR/*.erl
 
 ###compile .eos to .erl, and rebar compile
-- eos b  
-converts ./src/*.eos -> ./src/*.erl  
+- eos b
+converts ./src/*.eos -> ./src/*.erl
 ./rebar compile
 
 
@@ -191,17 +193,17 @@ do is the special case of pipeline
 ```erlang
 function(PARAM) do BLOCK
 ```
-is the same as 
+is the same as
 ```erlang
 function(PARAM) <| fun()->BLOCK
 ```
 
-and  
+and
 
 ```erlang
 function(PARAM) do |X,Y| BLOCK
 ```
-is the same as 
+is the same as
 ```erlang
 function(PARAM) <| fun(X,Y)->BLOCK
 ```
@@ -257,17 +259,17 @@ function(
 
 ###haskell like type definition
 
-function_name::Type->Type  
+function_name::Type->Type
 The first character of the type name start with an uppercase letter.
 - Int ---> int()
-- ABCType ---> abctype() 
+- ABCType ---> abctype()
 
 - bmiTell::Float->Float->Float
 ---> %% @spec bmiTell(float(),float()) -> float().
 
 ###haskell like "where"
 
-"where" creates local variable scope in previous block. 
+"where" creates local variable scope in previous block.
 
 ```python
     30 = A+B
@@ -321,24 +323,56 @@ If source file has no export definition, ErlangEOS adds "-compile(export_all)." 
       key=value
     }
 ```
----> eos:new(TYPE,[{key,value},{key,value}])
+---> eos:new('eos@TYPE',[{key,value},{key,value}])
 
 
 ###object using Erlang's process
 
 ```erlang
-    #<eos_obj>{
-      key=value
-      key=value
+    Dog = #<obj>{
+        barkPhrase = "woof!"
+        bark = method()-> io.format( @"#{This.barkPhrase}\n" )
     }
+
+    Chiwawa = Dog.clone()
+    Chiwawa.barkPhrase := "yip!"
+
+    io.format("Dog bark: ")
+    Dog.bark()
+
+    io.format("Chiwawa bark: ")
+    Chiwawa.bark()
+
+    // make an instance
+    MyChiwawa = Chiwawa.clone()
+    MyChiwawa.barkPhrase := "Yo Quiero Taco Bell"
+
+    io.format("myChiwawa bark: ")
+    MyChiwawa.bark()
 ```
 
 ###object using ETS
 ```erlang
-    #<eos_ets>{
-      key=value
-      key=value
+    Dog = #<etsobj>{
+        barkPhrase = "woof!"
+        bark = method()-> io.format( @"#{This.barkPhrase}\n" )
     }
+
+    Chiwawa = Dog.clone()
+    Chiwawa.barkPhrase := "yip!"
+
+    io.format("Dog bark: ")
+    Dog.bark()
+
+    io.format("Chiwawa bark: ")
+    Chiwawa.bark()
+
+    // make an instance
+    MyChiwawa = Chiwawa.clone()
+    MyChiwawa.barkPhrase := "Yo Quiero Taco Bell"
+
+    io.format("myChiwawa bark: ")
+    MyChiwawa.bark()
 ```
 
 
@@ -352,7 +386,7 @@ If source file has no export definition, ErlangEOS adds "-compile(export_all)." 
 
 ###RPC using EOS
 ```erlang
-    RPC = #<eos_rpc>{
+    RPC = #<rpc>{
       node=:192.168.0.2@main
       module=main
     }
@@ -397,6 +431,19 @@ is similer to rpc:call('192.168.0.2@main',main,hello,[world])
     }
 
     Dict = Dict2
+    //
+
+    Dict3 = Dict.a := aaa
+    Dict4 = Dict3.d := ddd
+    aaa = Dict4.a
+    ddd = Dict4.d
+
+    Dict5 = Dict4.map() do |Key,Value|
+                            @"#{Key} -> #{Value}"
+    "a -> aaa" = Dict5.a
+    "b -> beta" = Dict5.b
+    "c -> gamma" = Dict5.c
+    "d -> ddd" = Dict5.d
 ```
 
 

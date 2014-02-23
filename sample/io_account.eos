@@ -1,7 +1,7 @@
 // https://github.com/stevedekorte/io/blob/master/samples/misc/Account.io
 
 start()->
-    Account = #<eos_obj>{
+    Account = #<obj>{
         balance = 0.0
         deposit = method(V)-> This.balance := This.balance + V
         show    = method()-> @"Account balance: $#{This.balance}\n"

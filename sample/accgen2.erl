@@ -3,7 +3,7 @@
 
 
 foo(N) ->
-    Obj = eos:new(eos_obj,[],[{accumulator , N }]),
+    Obj = eos:new(eos@obj,[],[{accumulator , N }]),
     fun (I) -> 
         eos:set_slot(Obj,accumulator , eos:get_slot(Obj,accumulator) + I ) end.
 

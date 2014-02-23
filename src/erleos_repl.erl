@@ -36,7 +36,12 @@ loop(Env)->
 			loop( Env );
 
 		[":load",Filename]->
-			Src = erleos:load_eos_module(Filename),
+			try
+				erleos:load_source_and_compile(Filename)
+			catch
+				Ex ->
+					io:format("load failed: ~p , ~p\n",[Filename,Ex])
+			end,
 			loop( Env );
 
 		_ ->

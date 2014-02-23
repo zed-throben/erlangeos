@@ -1,12 +1,12 @@
--module(eos_obj).
+-module(eos@obj).
 -compile(export_all).
 -include("eos.hrl").
 
 new(Option,Params)->
 	Pid = spawn( fun loop/0 ),
-	Obj = ?eos(eos_obj,Pid),
+	Obj = ?eos(eos@obj,Pid),
 
-	%io:format("eos_obj:new ~p\n",[Params]),
+	%io:format("eos@obj:new ~p\n",[Params]),
     lists:foreach(
         fun(Item)->
 			%io:format("* ~p\n",[Item]),
@@ -19,10 +19,10 @@ loop()->
 	%io:format("loop: ~p\n",[self()]),
 	receive
 		{Sender,get_all}->
-			Sender ! {eos_obj,get_all,ok,get()};
+			Sender ! {eos@obj,get_all,ok,get()};
 
 		{Sender,get_slot,Key}->
-			Sender ! {eos_obj,get_slot,ok,get(Key)};
+			Sender ! {eos@obj,get_slot,ok,get(Key)};
 
 		{Sender,set_slot,Key,Value}->
 			put(Key,Value);
@@ -32,26 +32,26 @@ loop()->
 	end,
 	loop().
 
-get_all(?eos(eos_obj,Pid))->
+get_all(?eos(eos@obj,Pid))->
 	%io:format("get_slot: ~p\n",[self()]),
 	Pid ! {self(),get_all},
 	receive
-		{eos_obj,get_all,ok,KeyValues} -> KeyValues
+		{eos@obj,get_all,ok,KeyValues} -> KeyValues
 	end.
 
-get_slot(?eos(eos_obj,Pid),Key)->
+get_slot(?eos(eos@obj,Pid),Key)->
 	%io:format("get_slot: ~p\n",[self()]),
 	Pid ! {self(),get_slot,Key},
 	receive
-		{eos_obj,get_slot,ok,Value} -> Value
+		{eos@obj,get_slot,ok,Value} -> Value
 	end.
 
-set_slot(?eos(eos_obj,Pid),Key,Value)->
+set_slot(?eos(eos@obj,Pid),Key,Value)->
 	%io:format("set_slot: ~p\n",[self()]),
 	Pid ! {self(),set_slot,Key,Value},
 	Value.
 
-clone(?eos(eos_obj,Pid)=Obj)->
+clone(?eos(eos@obj,Pid)=Obj)->
 	KeyValues = get_all(Obj),
 	new([],KeyValues).
 

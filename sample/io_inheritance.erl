@@ -3,7 +3,7 @@
 
 
 start() ->
-    Dog = eos:new(eos_obj,[],[{barkPhrase , "woof!" },{bark , fun (This,Arguments) ->
+    Dog = eos:new(eos@obj,[],[{barkPhrase , "woof!" },{bark , fun (This,Arguments) ->
         io:format(eosstd:fmt("~s\n",[eosstd:to_str(eos:get_slot(This,barkPhrase))])) end }]),
     Chiwawa = eos:invoke(Dog,clone,[]),
     eos:set_slot(Chiwawa,barkPhrase , "yip!"),

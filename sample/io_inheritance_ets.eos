@@ -3,7 +3,7 @@
 start()->
     // Define a Dog object
 
-    Dog = #<obj>{
+    Dog = #<etsobj>{
         barkPhrase = "woof!"
         bark = method()-> io.format( @"#{This.barkPhrase}\n" )
     }

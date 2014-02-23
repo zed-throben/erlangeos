@@ -27,14 +27,14 @@ invoke(Obj,Method,Param) when is_pid(Obj)->
 
 invoke_list(Obj,Method,Param)->
 	%io:format("invoke list: ~p ~p ~p\n",[Obj,Method,Param]),
-    erlang:apply(eos_listobj,Method,[Obj|Param]).
+    erlang:apply(eos@list,Method,[Obj|Param]).
 
 invoke_dict(Obj,Method,Param)->
     %io:format("invoke dict: ~p ~p ~p\n",[Obj,Method,Param]),
-    erlang:apply(eos_dictobj,Method,[Obj|Param]).
+    erlang:apply(eos@dict,Method,[Obj|Param]).
 
 invoke_binary(Obj,Method,Param)->
-    erlang:apply(eos_binobj,Method,[Obj|Param]).
+    erlang:apply(eos@bin,Method,[Obj|Param]).
 
 invoke_pid(Obj,Method,Param)->
     rpc:call(Obj,Method,[Param]).
@@ -62,24 +62,27 @@ using(Obj,F)->
     release(Obj),
     R.
 
+%
 set_slot(?eos(Type,TypeParam)=Obj,Key,Value)->
-    erlang:apply(Type,set_slot,[Obj,Key,Value]).
+    erlang:apply(Type,set_slot,[Obj,Key,Value]);
 
+set_slot(?DICTIONARY=Obj,Key,Value) ->
+    eos@dict:set_slot(Obj,Key,Value);
+
+set_slot(Obj,Key,Value) when is_list(Obj)->
+    eos@list:set_slot(Obj,Key,Value).
+
+%
 get_slot(?eos(Type,TypeParam)=Obj,Key)->
     erlang:apply(Type,get_slot,[Obj,Key]);
 
-get_slot(Obj,Key) when is_list(Obj)->
-    case proplists:lookup(Key,Obj) of
-        {Key,Value} -> Value;
-        _ -> undefined
-    end;
-
 get_slot(?DICTIONARY=Obj,Key) ->
-    case dict:find(Key,Obj) of
-        {ok,Value} -> Value;
-        _ -> undefined
-    end.
+    eos@dict:get_slot(Obj,Key);
 
+get_slot(Obj,Key) when is_list(Obj)->
+    eos@list:get_slot(Obj,Key).
+
+%
 new(Type,Option,Params)->
     %io:format("#eos:new ~p ~p ~p\n",[Type,Option,Params]),
     erlang:apply(Type,new,[Option,Params]).

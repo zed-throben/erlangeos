@@ -1,2 +1,2 @@
--define(VERSION,"0.01b").
+-define(VERSION,"0.01c").
 -define(EOSRELEASE,true).

@@ -222,6 +222,43 @@ is_name(C)->
 	is_initial(C) or is_digit(C) or (C == $@).
 
 %
+check_invalid_char_of_symbol(LnRw,X)->
+	Err = case X of
+		$! -> true;
+		$# -> true;
+		$$ -> true;
+		$% -> true;
+		$^ -> true;
+		$& -> true;
+		%%%%$= -> true;
+		%%%%$_ -> true;
+		$+ -> true;
+		%%%%$- -> true;
+		$* -> true;
+		%%%%'/' -> true;
+		%%%%$| -> true;
+		$\\ -> true;
+		%%%%$: -> true;
+		$; -> true;
+		$' -> true;
+		$" -> true;
+		%%%%$, -> true;
+		%%%%$. -> true;
+		$? -> true;
+		$< -> true;
+		%%%%$> -> true;
+		%%%%$( -> true;
+		%%%%$) -> true;
+		$[ -> true;
+		%%%%$] -> true;
+		%%%%${ -> true;
+		%%%%$} -> true;
+		_ -> false
+	end,
+	if Err ->
+		erleos:compile_error(lexer,LnRw,"symbol has invalid character: " ++ [X] );
+		true -> []
+	end.
 
 lex_symbol([],Acc,{Line,Row} = LnRw)->
 	{ [],list_to_atom( lists:reverse(Acc) ),LnRw };
@@ -233,6 +270,7 @@ lex_symbol([H|T] = Rest,[]=Acc,{Line,Row} = LnRw)->
 	end;
 
 lex_symbol([H|T] = Rest,Acc,{Line,Row} = LnRw)->
+	check_invalid_char_of_symbol(LnRw,H),
 	Continuable = is_name(H) or (H == $/),
 	if	Continuable -> lex_symbol(T,[H|Acc],{Line,Row+1} );
 		true -> { Rest,list_to_atom( lists:reverse(Acc) ),LnRw }
@@ -274,19 +312,47 @@ lex_symbol_w(Src,{Line,Row} = LnRw)->
 	lex_symbol_w(Src,[],LnRw).
 
 %
+%
+%
+
+%% % VAR#Record
+%% lex_variable_rec(Src,Acc,{Line,Row} = LnRw)->
+%% 	{Rest,X,NewLnRw } = lex_symbol(Src,LnRw ),
+%% 	{Rest,'var_rec',{list_to_atom( lists:reverse(Acc) ),?token(LnRw,record_name,X)},NewLnRw }.
+
+% VAR:Ext
+lex_variable_ext(Src,Acc,{Line,Row} = LnRw)->
+	{Rest,XToken,NewLnRw } = lex_number(Src,LnRw ),
+	Token2 = case XToken of
+		{'float',X} ->		?token(LnRw,number,X);
+		{'int',X} ->		?token(LnRw,number,X);
+		{'n_int',N,X} ->	?token(LnRw,n_int,{N,X});
+		{'e_int',X,N} ->	?token(LnRw,e_int,{X,N})
+	end,
+	{Rest,'var_ext',{list_to_atom( lists:reverse(Acc) ),Token2},NewLnRw }.
+
+
 lex_variable([],Acc,{Line,Row} = LnRw)->
-	{ [],list_to_atom( lists:reverse(Acc) ),LnRw };
+	{ [],'var',list_to_atom( lists:reverse(Acc) ),LnRw };
 
 lex_variable([H|T] = Rest,[]=Acc,{Line,Row} = LnRw)->
 	Continuable = is_initial(H),
 	if	Continuable -> lex_variable(T,[H|Acc],{Line,Row+1} );
-		true -> { Rest,list_to_atom( lists:reverse(Acc) ),LnRw }
+		true -> { Rest,'var',list_to_atom( lists:reverse(Acc) ),LnRw }
 	end;
 
+lex_variable([$:,$=|T] = Rest,Acc,{Line,Row} = LnRw)->
+	{ Rest,'var',list_to_atom( lists:reverse(Acc) ),LnRw };
+
 lex_variable([H|T] = Rest,Acc,{Line,Row} = LnRw)->
-	Continuable = is_name(H),
-	if	Continuable -> lex_variable(T,[H|Acc],{Line,Row+1} );
-		true -> { Rest,list_to_atom( lists:reverse(Acc) ),LnRw }
+	case H of
+		$: -> lex_variable_ext(T,Acc,{Line,Row+1} );
+%%		$# -> lex_variable_rec(T,Acc,{Line,Row+1} );
+		_ ->
+			Continuable = is_name(H),
+			if	Continuable -> lex_variable(T,[H|Acc],{Line,Row+1} );
+				true -> { Rest,'var',list_to_atom( lists:reverse(Acc) ),LnRw }
+			end
 	end.
  	
 lex_variable(Src,{Line,Row} = LnRw)->
@@ -324,12 +390,17 @@ lex_int([$.,$.|T]=Src,Acc,{Line,Row} = LnRw )->
 	{ Src,{'int',list_to_integer( lists:reverse(Acc) )},LnRw };
 
 lex_int([H|T]=Src,Acc,{Line,Row} = LnRw )->
-	IsDigit = is_digit(H),
-	if	IsDigit -> lex_int  (T,[H|Acc],{Line,Row+1} );
-		H == $. -> lex_float(T,[H|Acc],{Line,Row+1} );
-		H == $# ->	{RetRest,RetX,RetLnRw} = lex_token(T,[],LnRw ),
-					{RetRest,{'n_int',list_to_integer(lists:reverse(Acc)),RetX},RetLnRw};
-		true -> { Src,{'int',list_to_integer( lists:reverse(Acc) )},LnRw }
+	try
+		IsDigit = is_digit(H),
+		if	IsDigit -> lex_int  (T,[H|Acc],{Line,Row+1} );
+			H == $. -> lex_float(T,[H|Acc],{Line,Row+1} );
+			H == $# ->	{RetRest,RetX,RetLnRw} = lex_token(T,[],LnRw ),
+						{RetRest,{'n_int',list_to_integer(lists:reverse(Acc)),RetX},RetLnRw};
+			true -> { Src,{'int',list_to_integer( lists:reverse(Acc) )},LnRw }
+		end
+	catch
+		_:_ ->
+			erleos:compile_error(lexer,LnRw,eosstd:fmt("invalid int format ~p",[lists:reverse(Acc)]))
 	end.
 
 lex_token([],Acc,{Line,Row} = LnRw)->
@@ -431,10 +502,10 @@ lex([9|T],Acc,{Line,Row} = LnRw)->
 % 	nextline(T,Acc,LnRw);
 
 % erlang direct
-lex([$%,$%|T],Acc,{Line,Row} = LnRw)->
-	{Rest,Token,NewLnRw} = lex_direct(T,[],LnRw ),
-	String = eosstd:to_bin(Token),
-	lex(Rest,[?token(LnRw,erlang_direct,String)|Acc],NewLnRw);
+%% lex([$%,$%|T],Acc,{Line,Row} = LnRw)->
+%% 	{Rest,Token,NewLnRw} = lex_direct(T,[],LnRw ),
+%% 	String = eosstd:to_bin(Token),
+%% 	lex(Rest,[?token(LnRw,erlang_direct,String)|Acc],NewLnRw);
 
 % // comment
 lex([$/,$/|T]	,Acc,{Line,Row} = LnRw)->
@@ -502,6 +573,19 @@ lex([$\\,$'|T],Acc,{Line,Row} = LnRw)->
 	lex(Rest,[?token(LnRw,char,Chars )|Acc],NewLnRw);
 
 
+
+lex([$=,$:,$= |T],Acc,{Line,Row} = LnRw)->
+	erleos:compile_error(lexer,LnRw,"use === instead of =:=");
+lex([$=,$/,$= |T],Acc,{Line,Row} = LnRw)->
+	erleos:compile_error(lexer,LnRw,"use !== instead of =/=");
+lex([$/,$= |T],Acc,{Line,Row} = LnRw)->
+	erleos:compile_error(lexer,LnRw,"use != instead of /=");
+lex([$=,$< |T],Acc,{Line,Row} = LnRw)->
+	erleos:compile_error(lexer,LnRw,"use <= instead of =<");
+lex([$=,$> |T],Acc,{Line,Row} = LnRw)->
+	erleos:compile_error(lexer,LnRw,"use >= instead of =>");
+
+
 %
 lex([$<,$< |T],Acc,{Line,Row} = LnRw)->
 	lex(T,[?token(LnRw,'<<')|Acc],{Line,Row+2} );
@@ -550,6 +634,7 @@ lex([$|,$> |T],Acc,{Line,Row} = LnRw)->
 	lex(T,[?token(LnRw,'|>')|Acc],{Line,Row+2} );
 lex([$<,$| |T],Acc,{Line,Row} = LnRw)->
 	lex(T,[?token(LnRw,'<|')|Acc],{Line,Row+2} );
+
 
 
 lex([$=,$=,$= |T],Acc,{Line,Row} = LnRw)->
@@ -625,14 +710,21 @@ lex([H|T] = Src,Acc,{Line,Row}=LnRw) ->
 						{'e_int',X,N} ->	lex(Rest,[?token(LnRw,e_int,{X,N})|Acc],NewLnRw)
 					end;
 
-		H == $$ ->	{Rest,X,NewLnRw } = lex_variable(T,LnRw ),
+		H == $$ ->	{Rest,'var',X,NewLnRw } = lex_variable(T,LnRw ),
 					lex(Rest,[?token(LnRw,globalvar,X)|Acc],NewLnRw);
-		H == $@ ->	{Rest,X,NewLnRw } = lex_variable(T,LnRw ),
+		H == $@ ->	{Rest,'var',X,NewLnRw } = lex_variable(T,LnRw ),
 					lex(Rest,[?token(LnRw,membervar,X)|Acc],NewLnRw);
-		H == $? ->	{Rest,X,NewLnRw } = lex_variable(Src,LnRw ),
+		H == $? ->	{Rest,'var',X,NewLnRw } = lex_variable(Src,LnRw ),
 					lex(Rest,[?token(LnRw,var,X)|Acc],NewLnRw);
-		IsUpper ->	{Rest,X,NewLnRw } = lex_variable(Src,LnRw ),
-					lex(Rest,[?token(LnRw,var,X)|Acc],NewLnRw);
+		IsUpper ->	case lex_variable(Src,LnRw ) of
+						{Rest,'var',X,NewLnRw } ->
+							lex(Rest,[?token(LnRw,var,X)|Acc],NewLnRw);
+						{Rest,'var_ext',{X,Y},NewLnRw } ->
+							lex(Rest,[?token(LnRw,var_ext,{X,Y})|Acc],NewLnRw)
+%%						{Rest,'var_rec',{X,Y},NewLnRw } ->
+%%							lex(Rest,[?token(LnRw,var_rec,{X,Y})|Acc],NewLnRw)
+					end;
+
 		H == $: ->	{Rest,X,NewLnRw } = lex_symbol_w(T,LnRw ),
 					lex(Rest,[?token(LnRw,quotedsymbol,X)|Acc],NewLnRw);
 		% symbol/atom

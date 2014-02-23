@@ -1,5 +1,5 @@
 foo(N)->
-    Obj = #<eos_obj>{ accumulator=N }
+    Obj = #<obj>{ accumulator=N }
     (\ (I)-> Obj.accumulator := Obj.accumulator + I)
 
 test()->
