@@ -8,8 +8,17 @@
 trim(X)->
 	string:strip(X,both,$\n).
 
+initial_message()->
+	iolist_to_binary(
+		io_lib:format("ErlangEOS ~s (abort with ^G)",[?VERSION])++
+	    if ?EOSRELEASE /= true -> io:fwrite(" ** DEBUG MODE **");
+	    	true -> []
+	    end
+	). 
+
 start()->
-    io:fwrite("ErlangEOS ~s (abort with ^G)\n",[?VERSION]),
+    io:fwrite( initial_message() ),
+    io:fwrite("\n"),
 
 	Bindings = erl_eval:bindings(erl_eval:new_bindings()),
 	loop( ?env(Bindings) ).

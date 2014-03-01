@@ -1,7 +1,6 @@
 - module('test_block').
 - compile(export_all).
 
-
 test() ->
     A = fun (X) -> 
         Y = X + 1 ,

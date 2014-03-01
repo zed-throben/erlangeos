@@ -1,7 +1,6 @@
 - module('test_scope').
 - compile(export_all).
 
-
 test() ->
     ( fun(X ) -> 
         [1,2,3,4] = X

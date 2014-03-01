@@ -52,7 +52,7 @@ all()->
             Module = erleos:path_to_module(File),
             io:format("\n\n~s : ~s --------------------------------------------\n",[Module,File]),
             Src = load(File),
-            case erleos:compile(Module,Src) of
+            case erleos:compile(Module,Src,[verbose]) of
                 {ok,ErlSrc} ->
                     erleos:erlsrc_to_module(ErlSrc),
                     erlang:apply(Module,test,[]);

@@ -1,7 +1,6 @@
 - module('test_imperative').
 - compile(export_all).
 
-
 test() ->
     put('$a' , 100),
     put('$b' , 200),

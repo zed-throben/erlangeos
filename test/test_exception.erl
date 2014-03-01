@@ -1,10 +1,8 @@
 - module('test_exception').
 - compile(export_all).
 
-
 f(N) ->
     N * 2 .
-
 
 test() ->
     aaa = try

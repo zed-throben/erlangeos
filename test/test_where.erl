@@ -1,10 +1,8 @@
 - module('test_where').
 - compile(export_all).
 
-
 test() ->
     testN(0).
-
 
 testN(N) ->
     eosstd:puts(eosstd:fmt("test #~s",[eosstd:to_str(N)])),
@@ -15,7 +13,6 @@ testN(N) ->
             testN(N + 1 );
         true -> []
     end end)().
-
 
 test(0) ->
     ( fun(A ,B ) -> 

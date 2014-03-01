@@ -1,4 +1,4 @@
-#ErlangEOS ver 0.01c - 2014/02/23(JST)
+#ErlangEOS ver 0.01d - 2014/03/01(JST)
 
 A dialect of Erlang that uses indentation like Python, and has many improvement like ErlangObjectSystem.
 
@@ -264,8 +264,12 @@ The first character of the type name start with an uppercase letter.
 - Int ---> int()
 - ABCType ---> abctype()
 
+- funcation::Unit->Float
+---> - spec function() -> float().
+
 - bmiTell::Float->Float->Float
----> %% @spec bmiTell(float(),float()) -> float().
+---> - spec bmiTell(float(),float()) -> float().
+
 
 ###haskell like "where"
 

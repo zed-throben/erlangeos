@@ -2,10 +2,8 @@
 - compile(export_all).
 - include_lib("kernel/include/file.hrl").
 
-
 compile_dir(Dir) ->
     compile_dir(Dir,Dir).
-
 
 compile_dir(Dir,DstDir) ->
     ( fun(Dir ,DstDir ) -> 
@@ -20,10 +18,8 @@ compile_dir(Dir,DstDir) ->
             end end)() end,Files)
     end)(erleos:trim_dir(Dir) ,erleos:trim_dir(DstDir) ).
 
-
 change_ext(Source,Ext) ->
     filename:rootname(Source) ++ Ext .
-
 
 procfile(Dir,DstDir,File) ->
     Src = eosstd:fmt("~s~s",[eosstd:to_str(Dir),eosstd:to_str(File)]),
@@ -44,7 +40,6 @@ procfile(Dir,DstDir,File) ->
         
     end.
 
-
 compile(Dir,DstDir,File) ->
     Src = eosstd:fmt("~s~s",[eosstd:to_str(Dir),eosstd:to_str(File)]),
     ErlFile = change_ext(File,".erl"),
@@ -52,17 +47,14 @@ compile(Dir,DstDir,File) ->
     eosstd:puts(eosstd:fmt("compile ~s -> ~s",[eosstd:to_str(Src),eosstd:to_str(Dst)])),
     erleos:compile_file(Src,Dst).
 
-
 loop(Dir,DstDir) ->
     compile_dir(Dir,DstDir),
     timer:sleep(2500),
     loop(Dir,DstDir).
 
-
 start(Dir,DstDir) ->
     spawn(fun () -> 
         loop(Dir,DstDir) end).
-
 
 start(Dir) ->
     start(Dir,Dir).

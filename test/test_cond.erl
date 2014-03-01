@@ -1,7 +1,8 @@
 - module('test_cond').
 - compile(export_all).
-%% @spec bmiTell(float(),float()) -> float().
 
+
+- spec bmiTell(float(),float()) -> float().
 bmiTell(Weight,Height) ->
     ( fun(Bmi ,Skinny ,Normal ,Fat ) -> 
         if
@@ -16,7 +17,6 @@ bmiTell(Weight,Height) ->
             
         end
     end)(Weight / (Height * Height )  ,18.5 ,25.0 ,30.0 ).
-
 
 bmiTell2(Weight,Height) ->
     ( fun(Bmi ,Skinny ,Normal ,Fat ) -> 
@@ -33,7 +33,6 @@ bmiTell2(Weight,Height) ->
         end
     end)(Weight / (Height * Height )  ,18.5 ,25.0 ,30.0 ).
 
-
 bmiTell3(Weight,Height) ->
     ( fun(Bmi ,Skinny ,Normal ,Fat ) -> 
         if
@@ -48,7 +47,6 @@ bmiTell3(Weight,Height) ->
             
         end
     end)(Weight / (Height * Height )  ,18.5 ,25.0 ,30.0 ).
-
 
 test() ->
     bmiTell(60,170),

@@ -1,10 +1,8 @@
 - module('test_case').
 - compile(export_all).
 
-
 f(X) ->
     {ok,okok}.
-
 
 test(URL) ->
     {ok,okok} = case f(URL) of
@@ -22,7 +20,6 @@ test(URL) ->
             end
         
     end.
-
 
 test() ->
     test(0).

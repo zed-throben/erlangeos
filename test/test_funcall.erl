@@ -1,7 +1,6 @@
 - module('test_funcall').
 - compile(export_all).
 
-
 test() ->
     [0,1,2,3] = lists:reverse([3,2,1,0]),
     [0,1,2,3] = lists:reverse([3,2,1,0]),

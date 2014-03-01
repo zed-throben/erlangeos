@@ -1,12 +1,10 @@
 - module('test_eos_obj').
 - compile(export_all).
 
-
 foo(N) ->
     Obj = eos:new(eos@obj,[],[{accumulator , N }]),
     fun (I) -> 
         eos:set_slot(Obj,accumulator , eos:get_slot(Obj,accumulator) + I ) end.
-
 
 foo2(N) ->
     Obj = eos:new(eos@obj,[],[{accumulator , N },{f , fun (This,Arguments) ->[I|RestArguments] = Arguments,
@@ -14,12 +12,10 @@ foo2(N) ->
     fun (I) -> 
         eos:invoke(Obj,f,[I]) end.
 
-
 foo3(N) ->
     Obj = eos:new(eos@obj,[],[{accumulator , N }]),
     fun (I) -> 
         eos:set_slot(Obj,accumulator , eos:get_slot(Obj,accumulator) + I ) end.
-
 
 test() ->
     A = eos:new(eos@obj,[],[{uho , fun (This,Arguments) ->

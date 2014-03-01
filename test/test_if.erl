@@ -1,7 +1,6 @@
 - module('test_if').
 - compile(export_all).
 
-
 test() ->
     30 = test_if(fun () -> 
         0 end),
@@ -11,7 +10,6 @@ test() ->
         2 end),
     d = test_if(fun () -> 
         3 end).
-
 
 test_if(F) ->
     

@@ -1,7 +1,6 @@
 - module('test_poker').
 - compile(export_all).
 
-
 test() ->
     straight = check_hands([{5,spade},{3,heart},{6,club},{2,dia},{4,dia}]),
     straight_flush = check_hands([{5,dia},{3,dia},{6,dia},{2,dia},{4,dia}]),
@@ -12,10 +11,8 @@ test() ->
     two_pair = check_hands([{1,spade},{4,dia},{2,spade},{1,club},{2,heart}]),
     one_pair = check_hands([{1,spade},{4,dia},{2,spade},{5,club},{1,heart}]).
 
-
 check_hands(X) ->
     hands(lists:sort(X)).
-
 
 hands([{1,X},{10,X},{11,X},{12,X},{13,X}]) ->
     royal_flush;

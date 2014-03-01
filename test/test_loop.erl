@@ -1,7 +1,6 @@
 - module('test_loop').
 - compile(export_all).
 
-
 test() ->
     A = eos_loop:times(fun () -> 
         eosstd:puts("*") end,5),

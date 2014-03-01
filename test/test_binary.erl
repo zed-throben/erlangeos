@@ -1,7 +1,6 @@
 - module('test_binary').
 - compile(export_all).
 
-
 truncate(X) when X < 0  ->
     0;
 
@@ -10,7 +9,6 @@ truncate(X) when X > 255  ->
 
 truncate(X) ->
     X.
-
 
 test() ->
     <<1,2,3>> = <<<<X>> ||

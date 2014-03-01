@@ -1,7 +1,6 @@
 - module('test_dict').
 - compile(export_all).
 
-
 test() ->
     PropList = [{a,alpha},{b,beta},{c,gamma}],
     3 = eos:invoke(PropList,length,[]),

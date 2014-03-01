@@ -127,6 +127,8 @@ compile_(Emitter,Module,Src,Options)->
 
     %io:format("modified src = ~p\n",[ModifiedSrc]),
 
+    io:format("EMIT -------------------\n"),
+
     use( Emitter,
         fun(Emitter)->
             %io:format("AAAAA\n"),

@@ -1,19 +1,16 @@
 - module('test_eos_ets').
 - compile(export_all).
 
-
 foo(N) ->
     Obj = eos:new(eos@etsobj,[],[{accumulator , N }]),
     fun (I) -> 
         eos:set_slot(Obj,accumulator , eos:get_slot(Obj,accumulator) + I ) end.
-
 
 foo2(N) ->
     Obj = eos:new(eos@obj,[],[{accumulator , N },{f , fun (This,Arguments) ->[I|RestArguments] = Arguments,
         eos:set_slot(This,accumulator , eos:get_slot(This,accumulator) + I ) end }]),
     fun (I) -> 
         eos:invoke(Obj,f,[I]) end.
-
 
 test() ->
     A = eos:new(eos@etsobj,[],[{uho , fun (This,Arguments) ->

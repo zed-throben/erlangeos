@@ -2,7 +2,6 @@
 - compile(export_all).
 - record(rec,{a,b,c}).
 
-
 test() ->
     A = #rec{a  = alpha },
     B = #rec{a  = alpha ,b  = beta ,c  = gamma },

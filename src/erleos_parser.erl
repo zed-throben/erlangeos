@@ -1263,6 +1263,7 @@ parse_line()->
 %
 %
 %
+
 extract_until(Target,Acc)->
     case next() of
         []->
@@ -1275,12 +1276,36 @@ extract_until(Target,Acc)->
 extract_until(Target)->
     extract_until(Target,[]).
 
+%
+%
+%
+
+add_decl(X)->
+    put(decl,[X|get(decl)] ).
+
+flush_decl()->
+    put(decl,[]).
+
+new_defun(LnRw,Name,Param,Body)->    
+    ?token( LnRw,defun,{flush_decl(),Name,count_arity(Param),Param,Body} ).
+
+new_defun2(LnRw,Name,Param,When,Body)->    
+    ?token( LnRw,defun2,{flush_decl(),Name,count_arity(Param),Param,When,Body} ).
+
+new_defmemberfun(LnRw,Name,Param,Body)->    
+    ?token( LnRw,defmemberfun,{flush_decl(),Name,count_arity(Param),Param,Body} ).
+
+new_defmemberfun2(LnRw,Name,Param,When,Body)->    
+    ?token( LnRw,defmemberfun2,{flush_decl(),Name,count_arity(Param),Param,When,Body} ).
+
+%
+
 parse_toplevel( ?token(LnRw,'-') )->
     Name = expect_type(symbol),
     expect('('),
     Param = parse_param(),
+    %%add_decl( ?token(LnRw,definition,{Name,Param} ) ),undefined;
     ?token(LnRw,definition,{Name,Param} );
-
 
 parse_toplevel( ?token(LnRw,symbol,Name) )->
     case next() of
@@ -1291,13 +1316,13 @@ parse_toplevel( ?token(LnRw,symbol,Name) )->
                 ?token(_,'->') ->
                     next(),
                     Body = parse_block(<<"function body">>),
-                    ?token( LnRw,defun,{Name,count_arity(Param),Param,Body} );
+                    new_defun( LnRw,Name,Param,Body );
 
                 ?token(_,'when') ->
                     next(),
                     When = extract_until('->'),
                     Body = parse_block(<<"function body">>),
-                    ?token( LnRw,defun2,{Name,count_arity(Param),Param,When,Body} );
+                    new_defun2( LnRw,Name,Param,When,Body );
 
                 X ->
                     erleos:compile_error( compile_error,lnrw(X),eosstd:fmt("-> or when is needed after function param, but ~p",[X]) )
@@ -1307,7 +1332,8 @@ parse_toplevel( ?token(LnRw,symbol,Name) )->
         ?token(_,'::')->
             Spec = parse_line(),
             %%io:format("@@@spec = ~p\n",[Spec]),
-            ?token( LnRw,funspec,{Name,Spec} );
+            add_decl( ?token( LnRw,funspec,{Name,Spec} ) ),
+            undefined;
 
         X ->
             erleos:compile_error( compile_error,lnrw(X),eosstd:fmt("( or :: is needed after toplevel function name, but ~p",[X]) )
@@ -1324,13 +1350,13 @@ parse_toplevel( ?token(LnRw,member) )->
         ?token(_,'->') ->
             next(),
             Body = parse_block(<<"member body">>),
-            ?token( LnRw,defmemberfun,{Name,count_arity(Param),Param,Body} );
+            new_defmemberfun( LnRw,Name,Param,Body );
 
         ?token(_,'when') ->
             next(),
             When = extract_until('->'),
             Body = parse_block(<<"member body">>),
-            ?token( LnRw,defmemberfun2,{Name,count_arity(Param),Param,When,Body} );
+            new_defmemberfun2( LnRw,Name,Param,When,Body );
 
         X ->
             erleos:compile_error( compile_error,lnrw(X),eosstd:fmt("-> or when is needed after member param, but ~p",[X]) )
@@ -1363,7 +1389,10 @@ conv_([])->
 
 conv_(Src)->
     %parse(),
-    emit( parse_toplevel() ),
+    case parse_toplevel() of
+        undefined -> undefined;
+        X -> emit(X)
+    end,
     conv_( cur_token() ).
 
 conv(Src)->
@@ -1378,6 +1407,7 @@ conv(Src)->
 
 init(Src)->
     put(src,Src),
+    put(decl,[]),
     next().
 
 %run_parse_block()->

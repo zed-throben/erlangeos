@@ -834,11 +834,12 @@ emit_block([H|T])->
 
 %
 
-emit_function([ ?t(defun,{Name,Arity,Params,Body})|T ] ,{Name,Arity},Count)->
-    if  Count =/= 0 -> p(";");
+emit_function([ ?t(defun,{Decl,Name,Arity,Params,Body})|T ] ,{Name,Arity},Count)->
+    if  Count =/= 0 -> p(";"),cr();
         true -> []
     end,
-    cr(),cr(),
+    cr(),
+    emit_decl(Decl),
     p("~s(",[Name]),
     emit_list(Params),
     p(") ->"),
@@ -849,11 +850,12 @@ emit_function([ ?t(defun,{Name,Arity,Params,Body})|T ] ,{Name,Arity},Count)->
 
     emit_function(T,{Name,Arity},Count+1);
 
-emit_function([ ?t(defun2,{Name,Arity,Params,Guard,Body})|T ] ,{Name,Arity},Count)->
-    if  Count =/= 0 -> p(";");
+emit_function([ ?t(defun2,{Decl,Name,Arity,Params,Guard,Body})|T ] ,{Name,Arity},Count)->
+    if  Count =/= 0 -> p(";"),cr();
         true -> []
     end,
-    cr(),cr(),
+    cr(),
+    emit_decl(Decl),
     p("~s(",[Name]),
     emit_list(Params),
     p(") when "),
@@ -868,11 +870,12 @@ emit_function([ ?t(defun2,{Name,Arity,Params,Guard,Body})|T ] ,{Name,Arity},Coun
 
 %
 
-emit_function([ ?t(defmemberfun,{Name,Arity,Params,Body})|T ] ,{Name,Arity},Count)->
-    if  Count =/= 0 -> p(";");
+emit_function([ ?t(defmemberfun,{Decl,Name,Arity,Params,Body})|T ] ,{Name,Arity},Count)->
+    if  Count =/= 0 -> p(";"),cr();
         true -> []
     end,
-    cr(),cr(),
+    cr(),
+    emit_decl(Decl),
     p("~s(This,Arguments)->",[Name]),
     indent(1),
     cr(),
@@ -886,11 +889,12 @@ emit_function([ ?t(defmemberfun,{Name,Arity,Params,Body})|T ] ,{Name,Arity},Coun
 
     emit_function(T,{Name,Arity},Count+1);
 
-emit_function([ ?t(defmemberfun2,{Name,Arity,Params,Guard,Body})|T ] ,{Name,Arity},Count)->
-    if  Count =/= 0 -> p(";");
+emit_function([ ?t(defmemberfun2,{Decl,Name,Arity,Params,Guard,Body})|T ] ,{Name,Arity},Count)->
+    if  Count =/= 0 -> p(";"),cr();
         true -> []
     end,
-    cr(),cr(),
+    cr(),
+    emit_decl(Decl),
     p("~s(This,Arguments) when ",[Name]),
     emit(Guard),
     p(" ->"),
@@ -942,6 +946,9 @@ spec([?t('->')|T],Arity)->
     p(","),
     spec(T,Arity-1);
 
+spec([?t(var,'Unit')|T],Arity)->
+    spec(T,Arity);
+
 spec([?t(var,Name)|T],Arity)->
     p( to_lower(Name) ),
     p("()"),
@@ -953,12 +960,28 @@ spec([H|T],Arity)->
 
 
 emit_spec(Name,Spec)->
+    cr(),
     Arity = count('->',Spec),
     %io:format("***spec = ~p --- ~p\n",[Spec,Arity]),
-    p("%% @spec ~s",[Name]),
+    p("- spec ~s",[Name]),
     p("("),
     spec(Spec,Arity),
-    p(".").
+    p("."),
+    cr().
+
+
+
+%
+
+e_decl( ?t(funspec,{Name,Spec}) )->
+    emit_spec(Name,Spec).
+
+emit_decl([])->
+    undefined;
+
+emit_decl([H|T])->
+    e_decl(H),
+    emit_decl(T).
 
 
 %
@@ -977,21 +1000,17 @@ emit_toplevel([ ?t(definition,{Name,Param})|T] )->
     endform(),
     emit_toplevel(T);
 
-emit_toplevel([ ?t(defun,{Name,Arity,Params,Body})|T ]=Src )->
+emit_toplevel([ ?t(defun,{Decl,Name,Arity,Params,Body})|T ]=Src )->
     emit_toplevel( emit_function(Src,{Name,Arity},0) );
 
-emit_toplevel([ ?t(defun2,{Name,Arity,Params,Guard,Body})|T ]=Src )->
+emit_toplevel([ ?t(defun2,{Decl,Name,Arity,Params,Guard,Body})|T ]=Src )->
     emit_toplevel( emit_function(Src,{Name,Arity},0) );
 
-emit_toplevel([ ?t(defmethod,{Name,Arity,Params,Body})|T ]=Src )->
+emit_toplevel([ ?t(defmethod,{Decl,Name,Arity,Params,Body})|T ]=Src )->
     emit_toplevel( emit_function(Src,{Name,Arity},0) );
 
-emit_toplevel([ ?t(defmethod2,{Name,Arity,Params,Guard,Body})|T ]=Src )->
+emit_toplevel([ ?t(defmethod2,{Decl,Name,Arity,Params,Guard,Body})|T ]=Src )->
     emit_toplevel( emit_function(Src,{Name,Arity},0) );
-
-emit_toplevel([ ?t(funspec,{Name,Spec})|T ] )->
-    emit_spec(Name,Spec),
-    emit_toplevel( T );
 
 emit_toplevel( [H|T] )->
     pp(H),
