@@ -37,9 +37,9 @@ make install
 #install binary on Unix system(Mac,FreeBSD,Linux)
 
 ```bash
-wget http://throben.org/erlangeos/erleos_0.01c.tar.gz
-tar xvf erleos_0.01c.tar.gz
-cd erleos_0.01c
+wget http://throben.org/erlangeos/erleos_0.01d.tar.gz
+tar xvf erleos_0.01d.tar.gz
+cd erleos_0.01d
 make install
 ```
 
@@ -50,9 +50,9 @@ Files will be installed to
 #install binary on Windows
 
 ```bash
-wget http://throben.org/erlangeos/erleos_0.01c.tar.gz
-tar xvf erleos_0.01c.tar.gz
-cd erleos_0.01c
+wget http://throben.org/erlangeos/erleos_0.01d.tar.gz
+tar xvf erleos_0.01d.tar.gz
+cd erleos_0.01d
 make install_cygpath
 ```
 
