@@ -1,4 +1,4 @@
-#ErlangEOS ver 0.01d - 2014/03/01(JST)
+#ErlangEOS ver 0.01e - 2014/03/09(JST)
 
 A dialect of Erlang that uses indentation like Python, and has many improvement like ErlangObjectSystem.
 
@@ -37,9 +37,9 @@ make install
 #install binary on Unix system(Mac,FreeBSD,Linux)
 
 ```bash
-wget http://throben.org/erlangeos/erleos_0.01d.tar.gz
-tar xvf erleos_0.01d.tar.gz
-cd erleos_0.01d
+wget http://throben.org/erlangeos/erleos_0.01e.tar.gz
+tar xvf erleos_0.01e.tar.gz
+cd erleos_0.01e
 make install
 ```
 
@@ -50,9 +50,9 @@ Files will be installed to
 #install binary on Windows
 
 ```bash
-wget http://throben.org/erlangeos/erleos_0.01d.tar.gz
-tar xvf erleos_0.01d.tar.gz
-cd erleos_0.01d
+wget http://throben.org/erlangeos/erleos_0.01e.tar.gz
+tar xvf erleos_0.01e.tar.gz
+cd erleos_0.01e
 make install_cygpath
 ```
 
@@ -420,11 +420,11 @@ is similer to rpc:call('192.168.0.2@main',main,hello,[world])
 
     //
 
-    PropList2 = #{
+    PropList2 = #[
         a=alpha
         b=beta
         c=gamma
-    }
+    ]
 
     PropList = PropList2
 

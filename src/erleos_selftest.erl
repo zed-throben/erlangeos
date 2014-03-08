@@ -32,10 +32,16 @@ load(F)->
     Filename = lists:flatten( io_lib:format("~s~s",[BaseDir,F]) ),
     {ok,Binary} = file:read_file( Filename ),
     unicode:characters_to_list(Binary,utf8).
-
+    
 %
-
 all()->
+    all(false).
+
+all(Verbose)->
+    Options = if Verbose -> [verbose];
+                 true -> []
+    end,
+
     {ok,Files} = file:list_dir("../test/"),
     Targets = lists:foldl(
         fun(File,Acc)->
@@ -52,7 +58,7 @@ all()->
             Module = erleos:path_to_module(File),
             io:format("\n\n~s : ~s --------------------------------------------\n",[Module,File]),
             Src = load(File),
-            case erleos:compile(Module,Src,[verbose]) of
+            case erleos:compile(Module,Src,Options) of
                 {ok,ErlSrc} ->
                     erleos:erlsrc_to_module(ErlSrc),
                     erlang:apply(Module,test,[]);

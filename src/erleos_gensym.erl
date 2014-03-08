@@ -18,10 +18,16 @@ start() ->
 alloc(Prefix) ->
 	gen_server:call(?MODULE, {alloc,Prefix}).
 
+newid() ->
+	gen_server:call(?MODULE, newid).
+
 init([]) ->
 	{ok, #state{prefix="@t_",count=0}}.
 
 %
+
+handle_call(newid,_From, State) ->
+    {reply, State#state.count,State#state{count = State#state.count+1 } };
 
 handle_call({alloc,Prefix}, _From, State) ->
 	NewSymStr = io_lib:format("~s~s~p", [Prefix,State#state.prefix,State#state.count]),

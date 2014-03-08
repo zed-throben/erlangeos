@@ -11,6 +11,7 @@ to_list(X) when is_atom(X) -> atom_to_list(X);
 to_list(X) when is_list(X) -> X.
 
 to_bin(X) when is_binary(X) -> X;
+to_bin(X) when is_atom(X) -> atom_to_binary(X,utf8);
 to_bin(X) when is_list(X) -> list_to_binary(X).
 
 to_atom(X) when is_atom(X) -> X;

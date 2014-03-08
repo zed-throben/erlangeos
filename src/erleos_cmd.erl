@@ -1,14 +1,40 @@
 -module(erleos_cmd).
 -compile(export_all).
 
+vprint(Fmt,Param)->
+	Verbose = get(verbose),
+	if Verbose == true -> io:format(Fmt,Param);
+		true -> []
+	end.
+
+vprint(Fmt)->
+	Verbose = get(verbose),
+	if Verbose == true -> io:format(Fmt);
+		true -> []
+	end.
+
+init()->
+	erleos:start(),
+	apply_config(),
+	addLibraries().
+
+
 main()->
-	%io:format("no arguments.\n").
-	erleos_repl:start().
+	repl().
 
 rebar()->
-	Rebar = case os:cmd("which rebar") of
-		[] -> "./rebar";
-		_  -> "rebar"
+	case os:cmd("which rebar") of
+		[] ->
+			Rebar = "./rebar",
+			case filelib:is_file(Rebar) of
+				true -> Rebar;
+				false ->
+					io:format("can't find 'rebar'.\n"),
+					erlang:halt()
+			end;
+
+		_  ->
+			"rebar"
 	end.
 
 main(CmdLine)->
@@ -27,6 +53,28 @@ main(CmdLine)->
 		["auto",SrcDir,DstDir] ->
 			erleos_auto_compiler:start(SrcDir,DstDir);
 
+		["clean"] ->
+			os:cmd("rm -f ./ebin/*.beam"),
+			SrcDir = "./src/",
+			{ok,Files} = file:list_dir(SrcDir),
+			EosFiles = lists:filter(
+				fun(F)-> filename:extension(F) == ".eos" end,
+				Files
+			),
+			ErlFiles = lists:map(
+				fun(F)-> filename:absname( SrcDir++filename:rootname(F)++".erl" ) end,
+				EosFiles
+			),
+			%io:format("FILES = ~p\n",[ErlFiles]),
+			lists:foreach(
+				fun(F)->
+					vprint("delete ~s\n",[F]),
+					file:delete(F)
+				end,
+				ErlFiles
+			),
+			erlang:halt();
+
 		%
 		["c"] ->
 			erleos:compile_dir("./src/"),
@@ -42,8 +90,7 @@ main(CmdLine)->
 
 		%
 		["b"] ->
-			erleos:compile_dir("./src/"),
-			Res = os:cmd( rebar()++" compile"),
+			Res = build(),
 			io:format("~s\n",[Res]),
 			erlang:halt();
 
@@ -54,7 +101,14 @@ main(CmdLine)->
 			erlang:halt();
 
 		["run"] ->
-			run(false);
+			Res = build(),
+			case string:str(Res,"rebar abort\n") of
+				0 -> run(false);
+				_ ->
+					io:format("~s\n",[Res]),
+					erlang:halt()
+			end;
+
 
 		["dbg"] ->
 			run(true);
@@ -63,6 +117,10 @@ main(CmdLine)->
 			io:format("run directory: ~p\n",[Path])
 	end.
 
+build()->
+	erleos:compile_dir("./src/"),
+	Res = os:cmd( rebar()++" compile").
+
 config()->
 	case file:consult(<<"eos.config">>) of
 		{ok,Config} ->
@@ -70,20 +128,28 @@ config()->
 		_ -> []
 	end.
 
-code_add_path(Path)->
-	io:format("ebin: ~p\n",[Path]),
-	code:add_path(Path).
-
 apply_config()->
 	C = config(),
-	case proplists:lookup(ebin,C) of
-		{ebin,Dirs} ->
+	case proplists:lookup(path,C) of
+		{path,Dirs} ->
 			lists:foreach(
-				fun(Dir)->code_add_path(Dir) end,
+				fun(Dir)->lib_path(Dir) end,
 				Dirs
-			);
+			);			
 		_ -> undefined
-	end.
+	end,
+	case proplists:lookup(env,C) of
+		{env,KeyVals} ->
+			lists:foreach(
+				fun({K,V})->
+					io:format("Env ~p = ~p\n",[K,V]),
+					os:putenv( eosstd:to_str(K),eosstd:to_str(V) )
+				end,
+				KeyVals
+			);			
+		_ -> undefined
+	end,
+	true.	
 
 run(WithRepl)->
 	{ok,Files} = file:list_dir("ebin"),
@@ -99,20 +165,19 @@ run(WithRepl)->
 
 	%io:format("App = ~s\n",[App]),
 
-	apply_config(),
-	code:add_path("ebin"),
+	init(),
 	application:start( eosstd:to_atom(App) ),
 
 
 	if WithRepl ->
 			erleos_repl:start();
 		true ->
-			erlang:halt()
+			%%erlang:halt()
+			[]
 	end.
 
 eval(WithRepl,Module,Fun,Params)->
-	apply_config(),
-	code:add_path("ebin"),
+	init(),
 
 	erlang:apply(Module,Fun,Params),
 
@@ -122,3 +187,39 @@ eval(WithRepl,Module,Fun,Params)->
 			erlang:halt()
 	end.
 
+repl()->
+	%io:format("no arguments.\n").
+	init(),
+	erleos_repl:start().
+
+
+lib_path(X)->
+	Absname = filename:absname(X),
+	vprint("library path: ~s(~s)\n",[X,Absname]),
+	code:add_path(Absname).
+
+addLibraries()->
+	%code:add_path("ebin"),
+	lib_path("./ebin"),
+
+	Base = "./deps/",
+	addLib(Base).
+
+addLib(Base)->
+	case file:list_dir(Base) of
+		{ok,Files} -> 
+			lists:foreach(
+				fun(F)->
+					RPath = eosstd:fmt("~s~s/ebin/",[Base,F]),
+					%APath = filename:absname(RPath),
+					%io:format("deps path = ~s(~s)\n",[RPath,APath])
+					lib_path(RPath),
+
+					RPath2 = eosstd:fmt("~s~s/deps/",[Base,F]),
+					addLib(RPath2)
+				end,
+				Files);
+
+		_ ->
+			vprint("no deps libraries\n")
+	end.

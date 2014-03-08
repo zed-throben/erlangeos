@@ -1,0 +1,4 @@
+start()->
+    Ruby = #<erlport>(ruby){}
+    PID = Ruby.:'Process::pid'()
+    

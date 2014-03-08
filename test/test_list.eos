@@ -30,10 +30,10 @@ test()->
     [london,boston] = [X || {X, fog} <- Weather]
 
     C = [{a,alpha},{b,beta}]
-    D = #{
+    D = #[
       a=alpha
       b=beta
-    }
+    ]
     C = D
     E = C.c := gamma
     gamma = E.c

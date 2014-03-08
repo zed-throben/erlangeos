@@ -440,6 +440,9 @@ lex([],Acc,{Line,Row} = LnRw)->
 %	lex(T,[?token(LnRw,'}>>')|Acc],{Line,Row+3} );
 
 %
+lex([$#,$[ |T],Acc,{Line,Row} = LnRw)->
+	lex(T,[?token(LnRw,'#[')|Acc],{Line,Row+2} );
+
 lex([$#,${ |T],Acc,{Line,Row} = LnRw)->
 	lex(T,[?token(LnRw,'#{')|Acc],{Line,Row+2} );
 
@@ -752,7 +755,7 @@ lex([H|T] = Src,Acc,{Line,Row}=LnRw) ->
 % token { {Line,Row},TokenData }
 lex(Src) ->
 	%lex( to_list(Src),[],{0,0} ).
-	lex( Src,[],{0,0} ).
+	lex( eosstd:to_list(Src),[],{0,0} ).
 
 %
 

@@ -9,40 +9,52 @@ trim(X)->
 	string:strip(X,both,$\n).
 
 initial_message()->
-	iolist_to_binary(
+	lists:flatten(
 		io_lib:format("ErlangEOS ~s (abort with ^G)",[?VERSION])++
-	    if ?EOSRELEASE /= true -> io:fwrite(" ** DEBUG MODE **");
+	    if ?EOSRELEASE /= true -> " ** DEBUG MODE **";
 	    	true -> []
 	    end
 	). 
 
+init()->
+	Bindings = erl_eval:bindings(erl_eval:new_bindings()),
+	?env(Bindings).
+
 start()->
     io:fwrite( initial_message() ),
     io:fwrite("\n"),
-
-	Bindings = erl_eval:bindings(erl_eval:new_bindings()),
-	loop( ?env(Bindings) ).
+	loop( init() ).
 
 
 loop(Env)->
 	Line = io:get_line("eos> "),
+	case eval_line(Env,Line) of
+		'exit' -> [];
+		'clear' -> start();
+		{ok,NewEnv,Ret} ->
+			io:format("=> ~p\n\n",[Ret]),
+			loop(NewEnv)
+	end.
+
+eval_line(Env,LineBin)->
+	Line = eosstd:to_list(LineBin),	
 	Token = string:tokens(trim(Line)," \t"),
 	%io:format("token = ~p\n",[Token]),
 	case Token of
 		[":exit"] ->
-			ok;
+			'exit';
 		[":clear"] ->
-			start();
+			'clear';
 
 		[":verbose"]->
-			loop( Env#env{verbose=true} );
+			{ok,Env#env{verbose=true} };
 
 		[":quiet"]->
-			loop( Env#env{verbose=false} );
+			{ok,Env#env{verbose=false} };
 
 		[":help"] ->
-			io:format(":exit :clear :help\n"),
-			loop( Env );
+			{ok,Env,
+				":exit :clear :help\n"};
 
 		[":load",Filename]->
 			try
@@ -51,26 +63,25 @@ loop(Env)->
 				Ex ->
 					io:format("load failed: ~p , ~p\n",[Filename,Ex])
 			end,
-			loop( Env );
+			{ok,Env,ok};
 
 		_ ->
 			{Ret,NewEnv} = 
 				if Env#env.rescue ->
 					try
-						eval(Env,Line)
+						eval_eos(Env,Line)
 					catch
 						_:X -> {eosstd:fmt("error: ~p\n",[X]),Env}
 					end;
 
 					true ->
-						eval(Env,Line)
+						eval_eos(Env,Line)
 				end,
 
-			io:format("=> ~p\n\n",[Ret]),
-			loop( NewEnv )
+			{ok,NewEnv,Ret }
 	end.
 
-eval(Env,Line)->
+eval_eos(Env,Line)->
 	Src = erleos:translate_block(Line) ++ ".",
 
 	if Env#env.verbose ->

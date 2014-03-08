@@ -1,8 +1,6 @@
 - module('test_cond').
 - compile(export_all).
 
-
-- spec bmiTell(float(),float()) -> float().
 bmiTell(Weight,Height) ->
     ( fun(Bmi ,Skinny ,Normal ,Fat ) -> 
         if

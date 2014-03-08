@@ -1,0 +1,31 @@
+/*
+-spec f1() -> 'myatom'.
+-spec f2() -> 123.
+-spec f3(integer()) -> 'myatom' | 123.
+-spec f4(integer()) -> 'myatom' | 123.
+*/
+
+f1::Unit->myatom
+f1()->
+    myatom
+
+f2::Unit->123
+f2()->
+    123
+
+f3::false->undefined
+f3(false)->
+    undefined
+
+f3::Integer->myatom | 123
+f3(N)->
+    case N rem 2 of
+        0 -> 123
+        1 -> myatom
+
+f4::Integer->myatom | 123
+f4(N)->
+    case N rem 2 of
+        0 -> f1()
+        1 -> f2()
+

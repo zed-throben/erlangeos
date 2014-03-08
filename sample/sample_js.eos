@@ -1,0 +1,9 @@
+start()->
+    application.start(sasl)
+    application.start(erlang_js)
+
+    JS = #<js>{}
+    JS.hello := "function(X){return 'hello '+X;}"
+    JS.hello('world')
+    
+

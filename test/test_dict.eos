@@ -18,11 +18,11 @@ test()->
     
     //
 
-    PropList2 = #{
+    PropList2 = #[
         a=alpha
         b=beta
         c=gamma
-    }
+    ]
 
     PropList = PropList2
 

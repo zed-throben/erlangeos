@@ -3,6 +3,19 @@
 -include("erleos_parser.hrl").
 -include("erleos.hrl").
 
+start()->
+    erleos_gensym:start().
+
+vprint(Verbose,Fmt)->
+    if Verbose -> io:format(Fmt);
+        true -> []
+    end.
+
+vprint(Verbose,Fmt,Param)->
+    if Verbose -> io:format(Fmt,Param);
+        true -> []
+    end.
+
 assert(Bool,LnRw,Msg)->
     if not Bool ->
         compile_error(assertion_failed,LnRw,Msg);
@@ -127,7 +140,7 @@ compile_(Emitter,Module,Src,Options)->
 
     %io:format("modified src = ~p\n",[ModifiedSrc]),
 
-    io:format("EMIT -------------------\n"),
+    vprint(Verbose,"EMIT -------------------\n"),
 
     use( Emitter,
         fun(Emitter)->
@@ -143,6 +156,7 @@ compile_(Emitter,Module,Src,Options)->
     ).
 
 
+
 compile(Module,Src,Options)->
     compile(erleos_emit:start(),Module,Src,Options).
 
@@ -155,6 +169,12 @@ compile(Emitter,Module,Src,Options)->
 
 compile(Module,Src)->
     compile(Module,Src,[]).
+
+
+%
+
+to_term(Src)->
+    translate_block(erleos_emit_term:start(),Src).
 
 translate_block(Src)->
     translate_block(erleos_emit:start(),Src).

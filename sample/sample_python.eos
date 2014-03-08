@@ -1,0 +1,9 @@
+start()->
+    Python = #<erlport>(python){}
+    3628800 = Python.math.factorial(10)
+
+    Math = Python.math
+    3628800 = Math.factorial(10)
+
+    {<<"hello">>,<<".txt">>} = Python.os.path.splitext('hello.txt')
+

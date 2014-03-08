@@ -1,4 +1,4 @@
-bmiTell::Float->Float->Float
+//bmiTell::Float->Float->Float
 bmiTell(Weight,Height)->
     cond  
             Bmi <= Skinny -> "You're underweight, you emo, you!"  

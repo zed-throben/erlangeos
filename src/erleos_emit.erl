@@ -376,6 +376,11 @@ e( ?t('method',Definitions) )->
     p("fun "),
     emit_method(Definitions);
 
+e( ?t('future',Block) )->
+    p("eos@future:start( fun()->"),
+    emit_block(Block),
+    p(" end )");
+
 
 e( ?t('while',{Expr,Block}) )->
     %io:format("@@expr = ~p\n",[Expr]),

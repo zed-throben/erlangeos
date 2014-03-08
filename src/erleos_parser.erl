@@ -50,7 +50,7 @@ test_count_arity()->
 % {symbol,'symbol'}
 % {number,123}
 % {var,'varname'}
-% 
+%
 
 trace(Tag,A)->
     io:format("~s: ~p\n",[Tag,A]).
@@ -85,7 +85,7 @@ next_token()->
 cur_token()->
 %    A = get( cur_token ),
 %    case A of
-%        undefined -> 
+%        undefined ->
 %            erleos:compile_error(parser,[],eosstd:fmt("unexpected end of code"));
 %        _ -> A
 %    end.
@@ -628,7 +628,7 @@ parse_fun_(Name,{Line,Row})->
 
 parse_funs_(Name,{Line,Row}=LnRw,Acc)->
     case cur_token() of
-        ?token({_,Row},'(') -> 
+        ?token({_,Row},'(') ->
             parse_funs_(Name,LnRw,[parse_fun_(Name,LnRw)|Acc]);
         _ ->
             ?token( LnRw,'fun',lists:reverse(Acc) )
@@ -656,11 +656,15 @@ parse_method(Name,LnRw)->
 %    expect('}>>'),
 %    ?token(LnRw,'dictionary',KeyValues);
 
-paren( ?token(LnRw,'#{') )->
+paren( ?token(LnRw,'#[') )->
     %KeyValues = parse_dic('}'),
     KeyValues = parse_record(<<"proplists">>, '}','='),
-    expect('}'),
+    expect(']'),
     ?token(LnRw,'proplist',KeyValues);
+
+paren( ?token(LnRw,'#{') )->
+    io:format("new map feature is not supported yet."),
+    [];
 
 paren( ?token(LnRw,'#<') )->
     [TypeName] = extract_until('>'),
@@ -787,12 +791,13 @@ path(A)->
 
         %% object.member
         ?token({Line2,Row2},'.') ->
+            %%io:format("####objpath ~p\n",[A]),
             next(),
             if (Line1==Line2) or (Row1==Row2) ->
                 B = cur_token(),
                 next(),
                 ?token(LnRw,objpath,[A,B]);
-            %                
+            %
             true ->
                     A
             end;
@@ -817,6 +822,11 @@ read_path()->
 
 %
 %
+
+factor( ?token(LnRw,'future') )->
+    expect('do'),
+    Block = parse_block(<<"future block">>),
+    ?token(LnRw,'future',Block);
 
 factor( ?token(LnRw,'while') )->
     %io:format("$$$$ begin while \n"),
@@ -941,7 +951,7 @@ factor(?token({Line,Row},_)=AA)->
                     BlockFun = ?token(LnRw,'fun',[{'fun',Arity,BlockFunParam,Body}]),
 
                     case A of
-                        ?token(_,funcall,{X,Param}) -> 
+                        ?token(_,funcall,{X,Param}) ->
                             ?token(LnRw,funcall,{X,[BlockFun|Param] });
 
                         ?token(_,objpath,[{X,Param}]) ->
@@ -971,13 +981,22 @@ term()->
     term2(B).
 
 term2(A)->
-    {Line,Row} = lnrw(A),
+    {Line,Row} = LnRw = lnrw(A),
 
     case cur_token() of
         ?token(_,'.') ->
-            term2( factor() );
+%            next(),
+%            Fac = factor(),
+%            io:format("####term ~p ~p\n",[A,Fac]),
+%            Res = term2( Fac ),
+%            io:format("####term->~p\n",[Res]),
+%            Res;
+            next(),
+            B = next(),
+            factor( ?token(LnRw,objpath,[A,B]) );
 
-        %            
+
+        %
 
         _ -> A
     end.
@@ -1286,16 +1305,16 @@ add_decl(X)->
 flush_decl()->
     put(decl,[]).
 
-new_defun(LnRw,Name,Param,Body)->    
+new_defun(LnRw,Name,Param,Body)->
     ?token( LnRw,defun,{flush_decl(),Name,count_arity(Param),Param,Body} ).
 
-new_defun2(LnRw,Name,Param,When,Body)->    
+new_defun2(LnRw,Name,Param,When,Body)->
     ?token( LnRw,defun2,{flush_decl(),Name,count_arity(Param),Param,When,Body} ).
 
-new_defmemberfun(LnRw,Name,Param,Body)->    
+new_defmemberfun(LnRw,Name,Param,Body)->
     ?token( LnRw,defmemberfun,{flush_decl(),Name,count_arity(Param),Param,Body} ).
 
-new_defmemberfun2(LnRw,Name,Param,When,Body)->    
+new_defmemberfun2(LnRw,Name,Param,When,Body)->
     ?token( LnRw,defmemberfun2,{flush_decl(),Name,count_arity(Param),Param,When,Body} ).
 
 %

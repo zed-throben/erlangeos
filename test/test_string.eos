@@ -1,0 +1,12 @@
+test()->
+    A = <<<HEREDOCUMENT
+abc
+def
+HEREDOCUMENT
+
+    B = <<<|||
+abc
+def|||
+    
+    io.format("A = ~p\n",[A])
+    io.format("B = ~p\n",[B])
